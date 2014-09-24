@@ -7,8 +7,8 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import be.tarsos.dsp.AudioDispatcher;
-import charts.FrequancyDomainGraph;
-import charts.TimeDomainGraph;
+import charts.specificCharts.FrequancyDomainGraph;
+import charts.specificCharts.TimeDomainGraph;
 
 public class GraphBuilder
 {
@@ -28,7 +28,7 @@ public class GraphBuilder
 		source = new File(fileName);
 	}
 
-	public void readFileByAudioDispatcher() throws UnsupportedAudioFileException, IOException
+	public void processAudioFile() throws UnsupportedAudioFileException, IOException
 	{
 		AudioDispatcher ad = AudioDispatcher.fromFile(source, bufferSize, overlapping);
 		format = ad.getFormat();
@@ -48,15 +48,6 @@ public class GraphBuilder
 	{
 		FrequancyDomainGraph xyChart = new FrequancyDomainGraph(name, "Hz", "Magnitude");
 
-		// find maximal amplitude
-		float max = Math.abs(amplitudes[1]);
-		for (int i = 2; i < amplitudes.length; i++)
-		{
-			if (Math.abs(amplitudes[i]) > max) max = Math.abs(amplitudes[i]);
-		}
-
-		System.out.println("max: " + max);
-
 		double[] xData = new double[bufferSize / 2];
 		double[] yData = new double[bufferSize / 2];
 		for (int i = 0; i < bufferSize / 2; i++)
@@ -65,7 +56,7 @@ public class GraphBuilder
 			yData[i] = amplitudes[i];
 		}
 
-		xyChart.setXYData(xData, yData);
+		xyChart.setData(xData, yData);
 		xyChart.drawChart();
 	}
 
@@ -74,10 +65,11 @@ public class GraphBuilder
 		FrequancyDomainGraph xyChart = new FrequancyDomainGraph(name, "Hz", "dB");
 
 		// find maximal amplitude
-		float max = Math.abs(amplitudes[5]);
-		for (int i = 6; i < amplitudes.length; i++)
+		float max = Math.abs(amplitudes[0]);
+		for (int i = 1; i < amplitudes.length; i++)
 		{
-			if (Math.abs(amplitudes[i]) > max) max = Math.abs(amplitudes[i]);
+			if (Math.abs(amplitudes[i]) > max)
+				max = Math.abs(amplitudes[i]);
 		}
 
 		System.out.println("max: " + max);
@@ -90,7 +82,7 @@ public class GraphBuilder
 			yData[i] = 20 * Math.log10(amplitudes[i] / max);
 		}
 
-		xyChart.setXYData(xData, yData);
+		xyChart.setData(xData, yData);
 		xyChart.drawChart();
 	}
 
@@ -98,11 +90,7 @@ public class GraphBuilder
 	{
 		TimeDomainGraph xyChart = new TimeDomainGraph(name, "sec", "Power");
 
-		double[] yData = new double[sourceData.length];
-		for (int i = 0; i < sourceData.length; i++)
-			yData[i] = sourceData[i];
-
-		xyChart.setData(yData, format.getSampleRate());
+		xyChart.setData(sourceData, format.getSampleRate());
 		xyChart.drawChart();
 
 	}

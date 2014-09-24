@@ -60,8 +60,6 @@ public class FFTProcessor implements AudioProcessor
 		System.out.println("TarsosFFTProcessor finished");
 		// Printer.printToFile(amplitudes, "TarsosAmplitudes.txt");
 		
-		System.out.println("Frames "+ frames);
-		
 		//average amplitudes
 		for (int i = 0; i < amplitudes.length; i++)
 			amplitudes[i] /= frames;

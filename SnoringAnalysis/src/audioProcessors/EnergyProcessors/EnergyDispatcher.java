@@ -7,21 +7,25 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import charts.specificCharts.FrequencyDomainEnergyGraph;
+import charts.specificCharts.MFCCGraph;
 import charts.specificCharts.TimeDomainEnergyGraph;
 import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.mfcc.MFCC;
 import be.tarsos.dsp.util.fft.FFT;
 
 public class EnergyDispatcher
 {
 	private File source;
-	private int bufferSize = 1024;
-	private int energyBlockSize = 8;
+	private int bufferSize = 1024*2;
+	private int energyBlockSize = 512;
 	private FDEnergyProcessor fdEnergyProcessor;
-	private FDEnergyProcessor2 fdEnergyProcessor2;
+	private FDRelativeEnergyProcessor fdRelativeEnergyProcessor;
 	private TDEnergyProcessor tdEnergyProcessor;
+	private MFCC mfccProcessor;
 	private double[] tdEnergyBuffer;
 	private double[] fdEnergyBuffer;
-	private double[] fdEnergyBuffer2;
+	private double[] fdRelativeEnergyBuffer;
+	private float[] mfccBuffer;
 	private AudioFormat format;
 	
 	
@@ -33,24 +37,32 @@ public class EnergyDispatcher
 	
 	public void dispatchSound() throws UnsupportedAudioFileException, IOException{
 		AudioDispatcher fdd = AudioDispatcher.fromFile(source, bufferSize, bufferSize / 2);
-		AudioDispatcher fdd2 = AudioDispatcher.fromFile(source, bufferSize, bufferSize / 2);
+		AudioDispatcher fdRelatived = AudioDispatcher.fromFile(source, bufferSize, 0);
 		AudioDispatcher tdd = AudioDispatcher.fromFile(source, bufferSize, 0);
+		AudioDispatcher mfccd = AudioDispatcher.fromFile(source, bufferSize, 0);
+		
 		format = fdd.getFormat();
 
 		fdEnergyProcessor = new FDEnergyProcessor(bufferSize, energyBlockSize);
-		fdEnergyProcessor2 = new FDEnergyProcessor2(bufferSize, energyBlockSize);
+		fdRelativeEnergyProcessor = new FDRelativeEnergyProcessor(bufferSize, energyBlockSize);
 		tdEnergyProcessor = new TDEnergyProcessor();
+		mfccProcessor = new MFCC((int)format.getSampleRate()/bufferSize, (int)format.getSampleRate());
 		
 		tdd.addAudioProcessor(tdEnergyProcessor);
 		fdd.addAudioProcessor(fdEnergyProcessor);
-		fdd2.addAudioProcessor(fdEnergyProcessor2);
+		fdRelatived.addAudioProcessor(fdRelativeEnergyProcessor);
+		mfccd.addAudioProcessor(mfccProcessor);
 		
 		tdd.run();
 		fdd.run();
-		fdd2.run();
+		fdRelatived.run();
+		mfccd.run();
+		
 		tdEnergyBuffer = tdEnergyProcessor.getEnergyBuffer();
 		fdEnergyBuffer = fdEnergyProcessor.getEnergyBuffer();
-		fdEnergyBuffer2 = fdEnergyProcessor2.getEnergyBuffer();
+		fdRelativeEnergyBuffer = fdRelativeEnergyProcessor.getEnergyBuffer();
+		mfccBuffer = mfccProcessor.getMFCC();
+		
 	}
 	
 	public void drawTDEnergyGraph(){
@@ -69,14 +81,20 @@ public class EnergyDispatcher
 		fdg.drawChart();
 	}
 	
-	public void drawFDEnergyGraph2()
+	public void drawFDRelativeEnergyGraph()
 	{
-		FrequencyDomainEnergyGraph fdg = new FrequencyDomainEnergyGraph("FD Energy2", "Hz", "yyy");
-		double[] xData = createFD2xData(fdEnergyProcessor2.getFFT(), format.getSampleRate());
+		TimeDomainEnergyGraph fdg = new TimeDomainEnergyGraph("FD Relative Energy", "Sec", "yyy");
 		//fdg.setData(xData, fdEnergyBuffer);
 		//fdg.setData(xData, convertAmplitudeToDB(fdEnergyBuffer));
-		fdg.setData(xData, convertAmplitudeToDB(normalizeAmplitudes(fdEnergyBuffer2)));
+		fdg.setData(fdRelativeEnergyBuffer, format.getSampleRate() / bufferSize);
 		fdg.drawChart();
+	}
+	
+	public void drawMFCC()
+	{
+		MFCCGraph mfccg = new MFCCGraph("MFCC", "xxx", "yyy");
+		mfccg.setData(mfccBuffer);
+		mfccg.drawChart();
 	}
 	
 	private double[] normalizeAmplitudes(double[] ampl)
@@ -111,7 +129,7 @@ public class EnergyDispatcher
 		return data;
 	}
 	
-	private double[] createFD2xData(FFT fft, float sampleRate)
+	private double[] createFDRelativexData(FFT fft, float sampleRate)
 	{
 		double[] data = new double[bufferSize / (energyBlockSize * 2 * 2)];
 		for(int i = 0; i < data.length / 2; i++)

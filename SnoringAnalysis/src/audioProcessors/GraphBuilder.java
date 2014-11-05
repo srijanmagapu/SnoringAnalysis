@@ -72,7 +72,7 @@ public class GraphBuilder
 				max = Math.abs(amplitudes[i]);
 		}
 
-		System.out.println("max: " + max);
+		//System.out.println("max: " + max);
 
 		double[] xData = new double[bufferSize / 2];
 		double[] yData = new double[bufferSize / 2];

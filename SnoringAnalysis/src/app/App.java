@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import be.tarsos.dsp.mfcc.MFCC;
 import audioProcessors.GraphBuilder;
 import audioProcessors.EnergyProcessors.EnergyDispatcher;
 
@@ -17,20 +18,20 @@ public class App {
 		}
 
 		
-		GraphBuilder tdp = new GraphBuilder(args[2]);
+		GraphBuilder tdp = new GraphBuilder(args[1]);
 		tdp.processAudioFile();
 		
 		tdp.drawTDGraph("Time Domain");
 		//tdp.drawMagnitudeGraph("Magnitude");
-		tdp.drawPowerGraph("Power");
+		//tdp.drawPowerGraph("Power");
 		
 		
-		//EnergyDispatcher ed = new EnergyDispatcher(args[2]);
-		//ed.dispatchSound();
+		EnergyDispatcher ed = new EnergyDispatcher(args[1]);
+		ed.dispatchSound();
 		//ed.drawTDEnergyGraph();
 		//ed.drawFDEnergyGraph();
-		//ed.drawFDEnergyGraph2();
-		
+		//ed.drawFDRelativeEnergyGraph();
+		//ed.drawMFCC();
 		
 	}
 

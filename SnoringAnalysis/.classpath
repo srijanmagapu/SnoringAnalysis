@@ -2,5 +2,20 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.23.jar" sourcepath="D:/WorkSpaces/Eclipse/jcommon-1.0.23/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/WorkSpaces/Eclipse/jcommon-1.0.23/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.19.jar" sourcepath="D:/WorkSpaces/Eclipse/jfreechart-1.0.19/source">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/WorkSpaces/Eclipse/jfreechart-1.0.19/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/TarsosDSP-latest.jar"/>
+	<classpathentry kind="lib" path="lib/Jama-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/jai-core-1.1.3-alpha.jar"/>
+	<classpathentry kind="lib" path="lib/jai_codec-1.1.3-alpha.jar"/>
+	<classpathentry kind="lib" path="lib/ojalgo-37.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

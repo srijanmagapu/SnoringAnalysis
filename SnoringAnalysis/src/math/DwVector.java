@@ -3,22 +3,27 @@ import java.util.Locale;
 
 public class DwVector
 {
-	float[] v;
+	double[] vector;
+	
+	public double[] getVector()
+	{
+		return vector;
+	}
 
 	public DwVector(float... values)
 	{
-		this.v = new float[values.length];
+		this.vector = new double[values.length];
 		for (int i = 0; i < values.length; i++)
 		{
-			this.v[i] = values[i];
+			this.vector[i] = values[i];
 		}
 	}
 
 	void print()
 	{
-		for (int i = 0; i < v.length; i++)
+		for (int i = 0; i < vector.length; i++)
 		{
-			System.out.printf(Locale.ENGLISH, "%+8.5f, ", v[i]);
+			System.out.printf(Locale.ENGLISH, "%+8.5f, ", vector[i]);
 		}
 		System.out.printf(Locale.ENGLISH, "\n");
 	}

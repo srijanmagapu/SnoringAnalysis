@@ -179,6 +179,8 @@ public class STFTEnergyProcssor implements AudioProcessor
 		}
 	}
 
+	int count = 0;
+	
 	/**
 	 * Will be called after the acoustical event detected by vbox finished.
 	 * Finalizes the energy computations.
@@ -188,6 +190,8 @@ public class STFTEnergyProcssor implements AudioProcessor
 		for (int i = 0; i < numOfBands; i++)
 			energy[i] /= overallEnergy;
 		
+		count++;
+		System.out.println("Adding Energy vector " + count);
 		FeatureQueue.getInstance().addEnergyBuffer(energy);
 	}
 

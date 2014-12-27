@@ -3,7 +3,7 @@ package businessLayer;
 public class FeatureWorker implements Runnable
 {
 	private FeatureQueue queue;
-	private IConsumer consumer;
+	private IFeatureConsumer consumer;
 	
 	private boolean stopped;
 	
@@ -12,7 +12,7 @@ public class FeatureWorker implements Runnable
 		this.queue = (FeatureQueue) featureQueue;
 	}
 	
-	public void setIConsumer(IConsumer consumer)
+	public void setIConsumer(IFeatureConsumer consumer)
 	{
 		this.consumer = consumer;
 	}
@@ -20,6 +20,8 @@ public class FeatureWorker implements Runnable
 	public void stopWorker()
 	{
 		stopped = true;
+		queue.addEnergyBuffer(new float[0]);
+		queue.addMFCCBuffer(new float[0]);
 	}
 
 	@Override
@@ -38,7 +40,8 @@ public class FeatureWorker implements Runnable
 				if(energy.length==0 || mfcc.length==0)
 					break;
 					
-				consumer.consume(energy, mfcc);
+				if(consumer != null)
+					consumer.consume(energy, mfcc);
 			}
 			catch (InterruptedException e)
 			{
@@ -47,7 +50,8 @@ public class FeatureWorker implements Runnable
 			}
 		}
 		
-		((Runnable)consumer).run();
+		if(consumer != null)
+			consumer.run();
 	}
 	
 	

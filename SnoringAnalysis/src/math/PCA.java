@@ -22,16 +22,16 @@ import Jama.Matrix;
 
 public class PCA
 {
-	int num_data = 0;
-	int dim_data = 0;
+	private int num_data = 0;
+	private int dim_data = 0;
 
-	DwVector[] data; // input data-vectors
-	DwVector mean; // translation vector
-	Matrix cvmat; // (variance)-covariance-matrix
+	private DwVector[] data; // input data-vectors
+	private DwVector mean; // translation vector
+	private Matrix cvmat; // (variance)-covariance-matrix
 
-	EigenvalueDecomposition edec; // eigenvalue decomposition (by Jama)
-	DwEigenVector[] evec; // list of eigenvectors and eigenvalues
-	Matrix emat; // eigenvector matrix (sorted colums by eigenvalues)
+	private EigenvalueDecomposition edec; // eigenvalue decomposition (by Jama)
+	private DwEigenVector[] evec; // list of eigenvectors and eigenvalues
+	private Matrix emat; // eigenvector matrix (sorted colums by eigenvalues)
 
 	public PCA(float[] data)
 	{
@@ -42,7 +42,7 @@ public class PCA
 	{
 		this.data = data;
 		this.num_data = data.length;
-		this.dim_data = data[0].v.length;
+		this.dim_data = data[0].vector.length;
 	}
 
 	public PCA compute()
@@ -50,7 +50,6 @@ public class PCA
 		centerData();
 		computeCovarianceMatrix();
 		updatePCAMatrix();
-		setTransformDimension(dim_data);
 		return this;
 	}
 
@@ -63,7 +62,7 @@ public class PCA
 		{
 			for (int j = 0; j < dim_data; j++)
 			{
-				mean_tmp[j] += data[i].v[j];
+				mean_tmp[j] += data[i].vector[j];
 			}
 		}
 
@@ -77,7 +76,7 @@ public class PCA
 		{
 			for (int j = 0; j < dim_data; j++)
 			{
-				data[i].v[j] -= mean_tmp[j];
+				data[i].vector[j] -= mean_tmp[j];
 			}
 		}
 		mean = new DwVector(mean_tmp);
@@ -106,7 +105,7 @@ public class PCA
 				double sum = 0;
 				for (int i = 0; i < num_data; i++)
 				{
-					sum += data[i].v[r] * data[i].v[c];
+					sum += data[i].vector[r] * data[i].vector[c];
 				}
 				mat[r][c] = mat[c][r] = sum / (num_data - 1);
 			}
@@ -190,15 +189,16 @@ public class PCA
 		// emat.print(8, 8);
 	}
 
-	DwVector transformVector(DwVector vec)
+	public DwVector transformVector(DwVector vec)
 	{
 		int cols = emat.getColumnDimension();
 		int rows = emat.getRowDimension();
 
-		if (cols != vec.v.length)
+		if (cols != vec.vector.length)
 		{
 			System.out.println("error, cant transform vector");
 		}
+		
 		double[][] emat_dd = emat.getArray();
 		float[] vec_new = new float[rows];
 
@@ -207,14 +207,15 @@ public class PCA
 			float val = 0;
 			for (int c = 0; c < cols; c++)
 			{
-				val += emat.get(r, c) * vec.v[c];
+				val += emat.get(r, c) * vec.vector[c];
 			}
 			vec_new[r] = val;
 		}
+		
 		return new DwVector(vec_new);
 	}
 
-	DwVector[] transformData(DwVector[] data, boolean transpose)
+	public DwVector[] transformData(DwVector[] data, boolean transpose)
 	{
 		Matrix mat = emat;
 		if (transpose)
@@ -239,7 +240,7 @@ public class PCA
 				float val = 0;
 				for (int c = 0; c < cols; c++)
 				{
-					val += emat_dd[r][c] * vec.v[c];
+					val += emat_dd[r][c] * vec.vector[c];
 				}
 				vec_new[r] = val;
 			}

@@ -66,14 +66,20 @@ public class MFCCProcessor implements AudioProcessor
 			finishMfccComputng();
 		}
 		
+		previousOutOfControlState = newOutOfControlState;
+		
 		return true;
 	}
+	
+	int count = 0;
 	
 	private void finishMfccComputng()
 	{
 		for(int i = 0; i < mfcc.length; i++)
 			mfcc[i] /= overallMfcc;
-		
+
+		count++;
+		System.out.println("Adding MFCC vector " + count);
 		FeatureQueue.getInstance().addMFCCBuffer(mfcc);
 	}
 	

@@ -56,7 +56,7 @@ public class PCA2
 	{
 		this.data = data;
 		this.num_data = data.length;
-		this.dim_data = data[0].v.length;
+		this.dim_data = data[0].vector.length;
 	}
 
 	public PCA2 compute()
@@ -77,7 +77,7 @@ public class PCA2
 		{
 			for (int j = 0; j < dim_data; j++)
 			{
-				mean_tmp[j] += data[i].v[j];
+				mean_tmp[j] += data[i].vector[j];
 			}
 		}
 
@@ -91,7 +91,7 @@ public class PCA2
 		{
 			for (int j = 0; j < dim_data; j++)
 			{
-				data[i].v[j] -= mean_tmp[j];
+				data[i].vector[j] -= mean_tmp[j];
 			}
 		}
 		mean = new DwVector(mean_tmp);
@@ -120,7 +120,7 @@ public class PCA2
 				double sum = 0;
 				for (int i = 0; i < num_data; i++)
 				{
-					sum += data[i].v[r] * data[i].v[c];
+					sum += data[i].vector[r] * data[i].vector[c];
 				}
 				mat[r][c] = mat[c][r] = sum / (num_data - 1);
 			}
@@ -225,7 +225,7 @@ public class PCA2
 		//int cols = emat.getColumnDimension();
 		//int rows = emat.getRowDimension();
 
-		if (cols != vec.v.length)
+		if (cols != vec.vector.length)
 		{
 			System.out.println("error, cant transform vector");
 		}
@@ -238,7 +238,7 @@ public class PCA2
 			float val = 0;
 			for (int c = 0; c < cols; c++)
 			{
-				val += emat.get(r, c) * vec.v[c];
+				val += emat.get(r, c) * vec.vector[c];
 			}
 			vec_new[r] = val;
 		}
@@ -273,7 +273,7 @@ public class PCA2
 				float val = 0;
 				for (int c = 0; c < cols; c++)
 				{
-					val += emat_dd[r][c] * vec.v[c];
+					val += emat_dd[r][c] * vec.vector[c];
 				}
 				vec_new[r] = val;
 			}

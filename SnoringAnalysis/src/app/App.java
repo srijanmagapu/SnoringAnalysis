@@ -8,8 +8,9 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
+import businessLayer.DBCreator;
 import businessLayer.FeatureQueue;
-import businessLayer.FeatureVectorConstructor;
+import businessLayer.FeatureProcessor;
 import businessLayer.FeatureWorker;
 import audioProcessors.GraphBuilder;
 import audioProcessors.EnergyProcessors.EnergyDispatcher;
@@ -40,14 +41,12 @@ public class App {
 		*/
 		
 		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
-		worker.setIConsumer(new FeatureVectorConstructor(3));
-		//(new Thread(worker, "Worker")).start();
+		worker.setIConsumer(new DBCreator(3));
+		(new Thread(worker, "Worker")).start();
 		
 		DispatchManager dispatchManager = new DispatchManager();
 		dispatchManager.initDispatcher( new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(args[0])) ));
 		
-		FeatureQueue.getInstance().addEnergyBuffer(new float[0]);
-		FeatureQueue.getInstance().addMFCCBuffer(new float[0]);
 		worker.stopWorker();
 	}
 

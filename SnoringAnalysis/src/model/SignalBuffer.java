@@ -1,56 +1,20 @@
 package model;
 
-public class SignalBuffer
+import java.util.Observable;
+
+public class SignalBuffer extends Observable
 {
-	private int N;
-	private int iWrite = 0;
-	private int iRead = 0;
-	private double buffer[];
-	private double sample;
-
-	public SignalBuffer(int N)
+	private float[] buffer;
+	
+	public void setByffer(float[] buffer)
 	{
-		this.N = N;
-		init();
-	}
-
-	private void init()
-	{
-		iRead = 0;
-		iWrite = 0;
-		buffer = new double[N];
-	}
-
-	public void put(double newSample)
-	{
-		buffer[iWrite] = newSample;
-		iRead = iWrite;
-		iWrite++;
-		if (iWrite == N)
-		{
-			iWrite = 0;
-		}
+		this.buffer = buffer.clone();
+		setChanged();
+		notifyObservers();
 	}
 	
-	public void put(double[] newSampleSet)
+	public float[] getBuffer()
 	{
-		for(double d : newSampleSet)
-			put(d);
-	}
-
-	public double get()
-	{
-		sample = buffer[iRead];
-		iRead--;
-		if (iRead < 0)
-		{
-			iRead = N - 1;
-		}
-		return sample;
-	}
-
-	public int getLength()
-	{
-		return N;
+		return this.buffer.clone();
 	}
 }

@@ -7,6 +7,7 @@ import java.net.URL;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import utils.Constants;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 import businessLayer.DBCreator;
 import businessLayer.FeatureQueue;
@@ -41,7 +42,7 @@ public class App {
 		*/
 		
 		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
-		worker.setIConsumer(new DBCreator(3, 3));
+		worker.setIConsumer(new DBCreator(Constants.numOfDimensions, Constants.numOfClusters));
 		(new Thread(worker, "Worker")).start();
 		
 		DispatchManager dispatchManager = new DispatchManager();

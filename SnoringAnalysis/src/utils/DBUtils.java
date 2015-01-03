@@ -39,4 +39,9 @@ public class DBUtils
 	{
 		// TODO Auto-generated method stub
 	}
+	
+	public static double[][] loadClusterCenters()
+	{
+		return null;
+	}
 }

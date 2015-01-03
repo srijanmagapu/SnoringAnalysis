@@ -33,12 +33,21 @@ public class PCA
 	private DwEigenVector[] evec; // list of eigenvectors and eigenvalues
 	private Matrix emat; // eigenvector matrix (sorted colums by eigenvalues)
 
+	public PCA()
+	{
+	}
+	
 	public PCA(float[] data)
 	{
 		this(new DwVector[] {new DwVector(data)});
 	}
 	
 	public PCA(DwVector[] data)
+	{
+		setData(data);
+	}
+	
+	public void setData(DwVector[] data)
 	{
 		this.data = data;
 		this.num_data = data.length;
@@ -256,9 +265,14 @@ public class PCA
 	}
 	
 	
-	public double[][] getArray()
+	public double[][] getTrasformMatrix()
 	{
 		return emat.getArray();
+	}
+	
+	public void setTransformMatrix(double[][] matrix)
+	{
+		this.emat = new Matrix(matrix);
 	}
 	
 }

@@ -39,7 +39,7 @@ public class DBCreator extends FeatureConsumer
 		pca.compute();
 		pca.setTransformDimension(requiredDimension);
 		
-		pcaMatrix =  pca.getArray();
+		pcaMatrix =  pca.getTrasformMatrix();
 		
 		//store PCA matrix for vectors projection
 		DBUtils.storePCAMatrix(pcaMatrix);

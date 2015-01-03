@@ -42,6 +42,8 @@ public class FeatureWorker implements Runnable
 					
 				if(consumer != null)
 					consumer.consume(energy, mfcc);
+				
+				
 			}
 			catch (InterruptedException e)
 			{

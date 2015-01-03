@@ -16,8 +16,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import java.awt.CardLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.ButtonGroup;
 
-public class MainFrame extends JFrame
+public class MainFrame extends JFrame implements ActionListener
 {
 
 	private JPanel contentPane;
@@ -38,6 +41,7 @@ public class MainFrame extends JFrame
 	private JMenuItem mntmPreferences;
 	private GraphsPanel graphsPanel;
 	private JPanel cardPanel;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
 
 	/**
 	 * Launch the application.
@@ -66,8 +70,8 @@ public class MainFrame extends JFrame
 	 */
 	public MainFrame()
 	{
-		setTitle("Snoring Analyzer");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/gui/icon.png")));
+		setTitle("Snoring Analyzer");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 680, 470);
 		
@@ -90,9 +94,11 @@ public class MainFrame extends JFrame
 		menuBar.add(mnView);
 		
 		rdbtnmntmPatient = new JRadioButtonMenuItem("Patient");
+		buttonGroup.add(rdbtnmntmPatient);
 		mnView.add(rdbtnmntmPatient);
 		
 		rdbtnmntmResearcher = new JRadioButtonMenuItem("Researcher");
+		buttonGroup.add(rdbtnmntmResearcher);
 		mnView.add(rdbtnmntmResearcher);
 		
 		mnTools = new JMenu("Tools");
@@ -108,6 +114,7 @@ public class MainFrame extends JFrame
 		menuBar.add(mnHelp);
 		
 		mntmAbout = new JMenuItem("About");
+		mntmAbout.addActionListener(this);
 		mnHelp.add(mntmAbout);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -141,4 +148,10 @@ public class MainFrame extends JFrame
 		}
 	}
 
+	public void actionPerformed(ActionEvent arg0) {
+		About about = new About();
+		about.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		about.setLocationRelativeTo(this);
+		about.setVisible(true);
+	}
 }

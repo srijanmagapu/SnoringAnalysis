@@ -41,7 +41,7 @@ public class App {
 		*/
 		
 		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
-		worker.setIConsumer(new DBCreator(3));
+		worker.setIConsumer(new DBCreator(3, 3));
 		(new Thread(worker, "Worker")).start();
 		
 		DispatchManager dispatchManager = new DispatchManager();

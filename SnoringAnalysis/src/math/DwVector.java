@@ -19,6 +19,15 @@ public class DwVector
 		}
 	}
 
+	public DwVector(double... values)
+	{
+		this.vector = new double[values.length];
+		for (int i = 0; i < values.length; i++)
+		{
+			this.vector[i] = values[i];
+		}
+	}
+	
 	void print()
 	{
 		for (int i = 0; i < vector.length; i++)

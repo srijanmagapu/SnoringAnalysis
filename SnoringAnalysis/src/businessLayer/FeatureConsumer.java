@@ -6,12 +6,14 @@ import java.util.List;
 public abstract class FeatureConsumer implements IFeatureConsumer
 {
 	protected final int requiredDimension;
-	protected List<float[]> data = new ArrayList<>();
+	protected final int numberOfClusters;
+	protected List<double[]> data = new ArrayList<>();
 	protected double[][] pcaMatrix;
 	
-	public FeatureConsumer(int dim)
+	public FeatureConsumer(int dim, int numberOfClusters)
 	{
 		this.requiredDimension = dim;
+		this.numberOfClusters = numberOfClusters;
 	}
 	
 	@Override
@@ -23,14 +25,21 @@ public abstract class FeatureConsumer implements IFeatureConsumer
 	private void constuctFeatureVector(float[] energy, float[] mfcc)
 	{
 		//merge vectors
-		float[] mergedVector = new float[energy.length + mfcc.length];
-		System.arraycopy(energy, 0, mergedVector, 0, energy.length);
-		System.arraycopy(mfcc, 0, mergedVector, energy.length, mfcc.length);
+		double[] mergedVector = new double[energy.length + mfcc.length];
+		for( int i=0 ; i<energy.length ; i++ )
+		{
+			mergedVector[i] = energy[i];
+		}
+
+		for( int i=energy.length ; i<energy.length+mfcc.length ; i++ )
+		{
+			mergedVector[i] = energy[i];
+		}
 		
 		finishConstuction(mergedVector);
 	}
 	
-	protected abstract void finishConstuction(float[] vector);
+	protected abstract void finishConstuction(double[] vector);
 	
 	@Override
 	public abstract void run();

@@ -2,21 +2,21 @@ package businessLayer;
 
 public class FeatureProcessor extends FeatureConsumer
 {
-	public FeatureProcessor(int dim)
+	public FeatureProcessor(int dim, int numberOfClusters)
 	{
-		super(dim);
+		super(dim, numberOfClusters);
 	}
 	
 	@Override
-	protected void finishConstuction(float[] vector)
+	protected void finishConstuction(double[] vector)
 	{
-		// TODO Auto-generated method stub
+		
 	}
 	
 	@Override
 	public void run()
 	{
-		// TODO Auto-generated method stub
+		
 	}
 	
 

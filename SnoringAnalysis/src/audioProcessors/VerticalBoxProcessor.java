@@ -1,5 +1,6 @@
 package audioProcessors;
 
+import model.SignalBuffer;
 import be.tarsos.dsp.AudioEvent;
 
 public class VerticalBoxProcessor implements IVerticalBoxProcessor
@@ -19,8 +20,16 @@ public class VerticalBoxProcessor implements IVerticalBoxProcessor
 	 */
 	private boolean outOfControl = false;
 	
+	private final SignalBuffer signalBuffer;
+	
+	public SignalBuffer getSignalBuffer()
+	{
+		return signalBuffer;
+	}
+	
 	public VerticalBoxProcessor()
 	{
+		this.signalBuffer = new SignalBuffer();
 	}
 	
 	@Override
@@ -35,6 +44,9 @@ public class VerticalBoxProcessor implements IVerticalBoxProcessor
 		}
 		
 		outOfControl = (double)outOfBounds / (double)data.length > threshold;
+		
+		if(outOfControl)
+			signalBuffer.setBuffer(data);
 		
 		return true;
 	}

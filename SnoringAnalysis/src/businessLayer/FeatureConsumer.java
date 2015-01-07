@@ -33,7 +33,7 @@ public abstract class FeatureConsumer implements IFeatureConsumer
 
 		for( int i=energy.length ; i<energy.length+mfcc.length ; i++ )
 		{
-			mergedVector[i] = energy[i];
+			mergedVector[i] = energy[i - energy.length];
 		}
 		
 		finishConstuction(mergedVector);

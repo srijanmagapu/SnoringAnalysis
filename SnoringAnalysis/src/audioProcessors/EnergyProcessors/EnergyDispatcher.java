@@ -58,7 +58,7 @@ public class EnergyDispatcher
 	public void drawTDEnergyGraph(){
 		TimeDomainEnergyGraph tdg = new TimeDomainEnergyGraph("TD Energy", "sec", "dBSPL");
 		tdg.setData(tdEnergyBuffer,  format.getSampleRate() / bufferSize);
-		tdg.drawChart();
+		tdg.getPanel();
 	}
 	
 	public void drawFDEnergyGraph()
@@ -68,7 +68,7 @@ public class EnergyDispatcher
 		//fdg.setData(xData, fdEnergyBuffer);
 		//fdg.setData(xData, convertAmplitudeToDB(fdEnergyBuffer));
 		fdg.setData(xData, convertAmplitudeToDB(normalizeAmplitudes(fdEnergyBuffer)));
-		fdg.drawChart();
+		fdg.getPanel();
 	}
 	
 	public void drawFDEnergyGraph2()
@@ -78,7 +78,7 @@ public class EnergyDispatcher
 		//fdg.setData(xData, fdEnergyBuffer);
 		//fdg.setData(xData, convertAmplitudeToDB(fdEnergyBuffer));
 		fdg.setData(xData, convertAmplitudeToDB(normalizeAmplitudes(fdEnergyBuffer2)));
-		fdg.drawChart();
+		fdg.getPanel();
 	}
 	
 	private double[] normalizeAmplitudes(double[] ampl)

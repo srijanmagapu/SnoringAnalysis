@@ -8,23 +8,12 @@ import org.jfree.ui.RefineryUtilities;
 
 public abstract class BaseChart
 {
-	protected String chartName = "";
 	protected String xAxisName = "";
 	protected String yAxisName = "";
-	protected String frameName = "";
 
 	protected double[] xData;
 	protected double[] yData;
 
-	public void setFrameName(String frameName)
-	{
-		this.frameName = frameName;
-	}
-
-	public void setChartName(String chartName)
-	{
-		this.chartName = chartName;
-	}
 
 	public void setxAxisName(String xAxisName)
 	{
@@ -36,9 +25,8 @@ public abstract class BaseChart
 		this.yAxisName = yAxisName;
 	}
 
-	public BaseChart(String chartName, String xAxisName, String yAxisName)
+	public BaseChart(String xAxisName, String yAxisName)
 	{
-		this.chartName = chartName;
 		this.xAxisName = xAxisName;
 		this.yAxisName = yAxisName;
 	}
@@ -124,19 +112,21 @@ public abstract class BaseChart
 	/**
 	 * Show the chart
 	 */
-	public void drawChart()
+	public ChartPanel getPanel()
 	{
 		XYDataset dataSet = createDataset(xData, yData);
 		JFreeChart chart = createChart(dataSet);
 		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(590, 420));
+		//chartPanel.setPreferredSize(new java.awt.Dimension(590, 420));
 
-		ApplicationFrame frame = new ApplicationFrame(frameName);
-		frame.setContentPane(chartPanel);
+		//ApplicationFrame frame = new ApplicationFrame(frameName);
+		//frame.setContentPane(chartPanel);
 
-		frame.pack();
-		RefineryUtilities.centerFrameOnScreen(frame);
-		frame.setVisible(true);
+		//frame.pack();
+		//RefineryUtilities.centerFrameOnScreen(frame);
+		//frame.setVisible(true);
+		
+		return chartPanel;
 	}
 
 	/**

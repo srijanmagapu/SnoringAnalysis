@@ -1,5 +1,6 @@
 package charts.specificCharts;
 
+
 import charts.baseCharts.LineChart;
 
 public class TimeDomainGraph extends LineChart

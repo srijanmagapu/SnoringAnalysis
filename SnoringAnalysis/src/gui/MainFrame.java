@@ -8,19 +8,23 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JProgressBar;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+
 import java.awt.CardLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.ButtonGroup;
 
-public class MainFrame extends JFrame implements ActionListener
+import app.DispatchManager;
+import app.IGraphsPanel;
+import app.IMainFrame;
+
+public class MainFrame extends JFrame implements ActionListener, IMainFrame
 {
 
 	private JPanel contentPane;
@@ -43,27 +47,6 @@ public class MainFrame extends JFrame implements ActionListener
 	private JPanel cardPanel;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args)
-	{
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					MainFrame frame = new MainFrame();
-					frame.setVisible(true);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -154,4 +137,17 @@ public class MainFrame extends JFrame implements ActionListener
 		about.setLocationRelativeTo(this);
 		about.setVisible(true);
 	}
+
+	@Override
+	public IGraphsPanel getIGraphsPanel()
+	{
+		return graphsPanel;
+	}
+
+	@Override
+	public ISourcePanel getSourcePanel()
+	{
+		return soundSourcePanel;
+	}
+	
 }

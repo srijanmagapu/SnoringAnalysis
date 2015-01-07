@@ -1,5 +1,8 @@
 package app;
 
+import gui.MainFrame;
+
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -17,38 +20,32 @@ import audioProcessors.GraphBuilder;
 import audioProcessors.EnergyProcessors.EnergyDispatcher;
 
 public class App {
-
-	public static void main(String[] args) throws IOException, UnsupportedAudioFileException
+	
+	public static void main(String[] args) throws UnsupportedAudioFileException, IOException
 	{
-		if (args.length < 1)
-		{
-			System.out.println("Where is the input file??????");
-		}
-
-		/*
-		GraphBuilder tdp = new GraphBuilder(args[2]);
-		tdp.processAudioFile();
-		
-		tdp.drawTDGraph("Time Domain");
-		//tdp.drawMagnitudeGraph("Magnitude");
-		tdp.drawPowerGraph("Power");
-		
-		
-		//EnergyDispatcher ed = new EnergyDispatcher(args[2]);
-		//ed.dispatchSound();
-		//ed.drawTDEnergyGraph();
-		//ed.drawFDEnergyGraph();
-		//ed.drawFDEnergyGraph2();
-		*/
 		
 		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
 		worker.setIConsumer(new DBCreator(Constants.numOfDimensions, Constants.numOfClusters));
 		(new Thread(worker, "Worker")).start();
 		
-		DispatchManager dispatchManager = new DispatchManager();
-		dispatchManager.initDispatcher( new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(args[0])) ));
+		EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					MainFrame frame = new MainFrame();
+					DispatchManager dm = new DispatchManager(frame);
+					frame.setVisible(true);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
 		
-		worker.stopWorker();
+		//app.dm.initDispatcher( new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(args[0])) ));
 	}
 
 }

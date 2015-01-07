@@ -56,7 +56,7 @@ public class GraphBuilder
 		}
 
 		xyChart.setData(xData, yData);
-		xyChart.drawChart();
+		xyChart.getPanel();
 	}
 
 	public void drawPowerGraph(String name)
@@ -82,7 +82,7 @@ public class GraphBuilder
 		}
 
 		xyChart.setData(xData, yData);
-		xyChart.drawChart();
+		xyChart.getPanel();
 	}
 
 	public void drawTDGraph(String name)
@@ -90,7 +90,7 @@ public class GraphBuilder
 		TimeDomainGraph xyChart = new TimeDomainGraph(name, "sec", "Power");
 
 		xyChart.setData(sourceData, format.getSampleRate());
-		xyChart.drawChart();
+		xyChart.getPanel();
 
 	}
 

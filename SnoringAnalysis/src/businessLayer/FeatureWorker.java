@@ -1,7 +1,11 @@
 package businessLayer;
 
+import java.util.ArrayList;
+
 public class FeatureWorker implements Runnable
 {
+	private static ArrayList<FeatureWorker> workerList = new ArrayList<>();
+	
 	private FeatureQueue queue;
 	private IFeatureConsumer consumer;
 	
@@ -10,11 +14,18 @@ public class FeatureWorker implements Runnable
 	public FeatureWorker(FeatureQueue featureQueue)
 	{
 		this.queue = (FeatureQueue) featureQueue;
+		workerList.add(this);
 	}
 	
 	public void setIConsumer(IFeatureConsumer consumer)
 	{
 		this.consumer = consumer;
+	}
+	
+	public static void stopAllWorkers()
+	{
+		for(FeatureWorker worker : workerList)
+			worker.stopWorker();
 	}
 	
 	public void stopWorker()

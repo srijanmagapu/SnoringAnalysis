@@ -21,13 +21,13 @@ public abstract class AreaChart extends BaseChart
 	
 	public AreaChart(String chartName, String xAxisName, String yAxisName)
 	{
-		super(chartName, xAxisName, yAxisName);
+		super(xAxisName, yAxisName);
 	}
 	
 	@Override
 	protected JFreeChart createChart(final XYDataset dataset)
 	{
-		JFreeChart ch = ChartFactory.createXYAreaChart(chartName, xAxisName, yAxisName, dataset, PlotOrientation.VERTICAL, false, true, false);
+		JFreeChart ch = ChartFactory.createXYAreaChart("",xAxisName, yAxisName, dataset, PlotOrientation.VERTICAL, false, true, false);
 
 		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 		ch.setBackgroundPaint(Color.white);

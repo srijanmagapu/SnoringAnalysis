@@ -1,5 +1,6 @@
 package audioProcessors;
 
+import model.SignalBuffer;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.util.fft.FFT;
@@ -19,7 +20,14 @@ public class STFTEnergyProcssor implements AudioProcessor
 	 */
 	//private final int numOfBands = 10;
 	private final int numOfBands;
-
+	
+	private final SignalBuffer signalBuffer;
+	
+	public SignalBuffer getSignalBuffer()
+	{
+		return signalBuffer;
+	}
+	
 	/**
 	 * The implementor of V-Box algorithm. Will signal when acoustical event detected.
 	 */
@@ -98,6 +106,8 @@ public class STFTEnergyProcssor implements AudioProcessor
 		this.bufferSize = bufferSize;
 		this.freqBand = freqBand;
 		this.numOfBands = numOfBands;
+		
+		this.signalBuffer = new SignalBuffer();
 		this.fft = new FFT(bufferSize, new HammingWindow());
 
 		this.previousOutOfControlState = false;
@@ -193,6 +203,8 @@ public class STFTEnergyProcssor implements AudioProcessor
 		count++;
 		System.out.println("Adding Energy vector " + count);
 		FeatureQueue.getInstance().addEnergyBuffer(energy);
+		
+		signalBuffer.setBuffer(energy);
 	}
 
 	/**

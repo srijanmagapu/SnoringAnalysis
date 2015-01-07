@@ -39,9 +39,12 @@ import java.awt.Component;
 
 public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorListener, ComponentListener, ActionListener, MouseListener
 {
+	private SoundSource DEFAULT_SOUNDSOURCE = SoundSource.File;
+	private String DEFAULT_FOLDER = "sounds";
+	
 	private JTextField filePathTextField;
 	private File chosenFile;
-	private SoundSource soundSource;
+	private SoundSource soundSource = DEFAULT_SOUNDSOURCE;
 	private JRadioButton rdbtnMic;
 	private JRadioButton rdbtnFile;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
@@ -202,7 +205,7 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorLi
 		else if (button == btnBrowse)
 		{
 			final JFileChooser fc = new JFileChooser();
-			fc.setCurrentDirectory(Paths.get("").toAbsolutePath().toFile());
+			fc.setCurrentDirectory(new File(Paths.get("").toAbsolutePath().toFile(), DEFAULT_FOLDER));
 			// new java.awt.FileDialog((java.awt.Frame)null).setVisible(true);
 			int returnVal = fc.showOpenDialog(event.getComponent());
 

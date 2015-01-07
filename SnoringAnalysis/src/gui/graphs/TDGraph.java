@@ -25,15 +25,16 @@ public class TDGraph extends ChartPanel implements ISignalGraph
 	private XYSeries xySeries;
 	private JFreeChart chart;
 	
-	public TDGraph(JFreeChart chart)
+	public TDGraph(JFreeChart chart, String name)
 	{
 		super(chart);
-		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Time Domain", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
+		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), name, TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
 
 		xySeries = new XYSeries("");
 		XYSeriesCollection dataset = new XYSeriesCollection(xySeries);
 		chart = ChartFactory.createTimeSeriesChart("", "", "", dataset);
 		chart.removeLegend();
+		chart.getXYPlot().getDomainAxis().setAxisLineVisible(false);
 		this.setChart(chart);
 	}
 	
@@ -42,12 +43,21 @@ public class TDGraph extends ChartPanel implements ISignalGraph
 	@Override
 	public void setData(float[] yData, float sampleRate)
 	{
+		sampleRate = 1;
 		double[] doubleData = new double[yData.length];
 		for (int i = 0; i < yData.length; i++)
 			doubleData[i] = yData[i];
 
 		setData(doubleData, sampleRate);
 	}
+	/*public void setData(float[] yData, float sampleRate)
+	{
+		double[] doubleData = new double[yData.length];
+		for (int i = 0; i < yData.length; i++)
+			doubleData[i] = yData[i];
+
+		setData(doubleData, sampleRate);
+	}*/
 	
 	private void setData(double[] yData, float sampleRate)
 	{
@@ -57,9 +67,6 @@ public class TDGraph extends ChartPanel implements ISignalGraph
 		for(int i=0; i< yData.length; i++)
 			xySeries.add(xData[i], yData[i]);
 		
-		@SuppressWarnings("unused")
-		int i=0;
-		i=6 +1;
 	}
 	
 	private double[] createXData(int size, float sampleRate)

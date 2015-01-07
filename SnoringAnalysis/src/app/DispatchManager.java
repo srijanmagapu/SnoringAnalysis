@@ -2,12 +2,17 @@ package app;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import gui.ISourcePanel.SoundSource;
 import gui.SignalGraph;
 import gui.interfaces.ISignalGraph;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import model.SignalBuffer;
@@ -21,6 +26,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.filters.BandPass;
 import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
+import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 
 public class DispatchManager implements IStartProcessingHandler
@@ -59,10 +65,20 @@ public class DispatchManager implements IStartProcessingHandler
 		
 		mainDispatcher = new AudioDispatcher(stream, audioBufferSize, bufferOverlap);
 		
+		AudioPlayer audioPlayer = null;
+		try
+		{
+			audioPlayer = new AudioPlayer(JVMAudioInputStream.toAudioFormat(mainDispatcher.getFormat()));
+		}
+		catch (LineUnavailableException e)
+		{
+			e.printStackTrace();
+		}	
+
 		//filter
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
 		
-		//V-Box
+		//V-Box - TD Graph
 		VerticalBoxProcessor vboxProcessor = new VerticalBoxProcessor();
 		
 		final ISignalGraph tdView = mainFrame.getIGraphsPanel().getTDGraphPanel();
@@ -73,15 +89,24 @@ public class DispatchManager implements IStartProcessingHandler
 		STFTEnergyProcssor energyProcessor = new STFTEnergyProcssor(audioBufferSize, energyFreqBand, numOfEnergyBands);
 		energyProcessor.setIVerticalBoxProcessor(vboxProcessor);
 		
+		final ISignalGraph energyView = mainFrame.getIGraphsPanel().getEnergyGraphPanel();
+		final SignalBuffer energyBuffer = energyProcessor.getSignalBuffer();
+		SignalGraphController energyControler = new SignalGraphController(energyView, energyBuffer);
+		
 		//MFCC
 		MFCCProcessor mfccProcessor = new MFCCProcessor(audioBufferSize, sampleRate, amountOfCepstrumCoef, amountOfMelFilters, minFreq, maxFreq);
 		mfccProcessor.setIVerticalBoxProcessor(vboxProcessor);
+		
+		final ISignalGraph mfccView = mainFrame.getIGraphsPanel().getMFCCGraphPanel();
+		final SignalBuffer mfccBuffer = mfccProcessor.getSignalBuffer();
+		SignalGraphController mfccControler = new SignalGraphController(mfccView, mfccBuffer);
 		
 		//Dummy processor
 		dummyProcessor = new DummyProcessor();
 		dummyProcessor.setInterruptProcessing(false);
 		
-		
+		if(audioPlayer != null)
+			mainDispatcher.addAudioProcessor(audioPlayer);
 		mainDispatcher.addAudioProcessor(bandPass);
 		mainDispatcher.addAudioProcessor(vboxProcessor);
 		mainDispatcher.addAudioProcessor(energyProcessor);

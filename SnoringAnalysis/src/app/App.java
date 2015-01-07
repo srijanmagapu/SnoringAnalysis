@@ -9,6 +9,7 @@ import java.net.URL;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.UIManager;
 
 import utils.Constants;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
@@ -23,6 +24,11 @@ public class App {
 	
 	public static void main(String[] args) throws UnsupportedAudioFileException, IOException
 	{
+		try
+		{
+		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch(Exception e){}
 		
 		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
 		worker.setIConsumer(new DBCreator(Constants.numOfDimensions, Constants.numOfClusters));

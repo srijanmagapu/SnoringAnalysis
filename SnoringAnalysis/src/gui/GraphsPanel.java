@@ -21,9 +21,9 @@ import app.IGraphsPanel;
 public class GraphsPanel extends JPanel implements IGraphsPanel
 {
 	private ChartPanel frequencyDomainPanel;
-	private ChartPanel mfccPanel;
-	private ChartPanel energyPanel;
 	private TDGraph tdGraph;
+	private TDGraph mfccGraph;
+	private TDGraph energyGraph;
 	
 	public TDGraph getTDGraph()
 	{
@@ -37,23 +37,19 @@ public class GraphsPanel extends JPanel implements IGraphsPanel
 	{
 		setLayout(new GridLayout(0, 2, 5, 0));
 		
-		tdGraph = new TDGraph((JFreeChart) null);
+		tdGraph = new TDGraph((JFreeChart) null, "Time Domain");
 		add(tdGraph);
 
 		frequencyDomainPanel = new ChartPanel(null);
 		frequencyDomainPanel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Frequency Domain", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
 		add(frequencyDomainPanel);
 		frequencyDomainPanel.setLayout(new BorderLayout(0, 0));
-
-		mfccPanel = new ChartPanel(null);
-		mfccPanel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "MFCC", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
-		add(mfccPanel);
-		mfccPanel.setLayout(new BorderLayout(0, 0));
-
-		energyPanel = new ChartPanel(null);
-		energyPanel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
-		add(energyPanel);
-		energyPanel.setLayout(new BorderLayout(0, 0));
+		
+		mfccGraph = new TDGraph((JFreeChart) null, "MFCC");
+		add(mfccGraph);
+		
+		energyGraph = new TDGraph((JFreeChart) null, "Energy");
+		add(energyGraph);
 
 	}
 
@@ -61,6 +57,18 @@ public class GraphsPanel extends JPanel implements IGraphsPanel
 	public TDGraph getTDGraphPanel()
 	{
 		return tdGraph;
+	}
+
+	@Override
+	public TDGraph getMFCCGraphPanel()
+	{
+		return mfccGraph;
+	}
+
+	@Override
+	public TDGraph getEnergyGraphPanel()
+	{
+		return energyGraph;
 	}
 
 }

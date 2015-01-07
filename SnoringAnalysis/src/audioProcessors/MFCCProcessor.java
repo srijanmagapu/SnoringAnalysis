@@ -1,5 +1,6 @@
 package audioProcessors;
 
+import model.SignalBuffer;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.mfcc.MFCC;
@@ -29,12 +30,20 @@ public class MFCCProcessor implements AudioProcessor
 		this.vboxProcessor = vbox;
 	}
 	
+	private final SignalBuffer signalBuffer;
+	
+	public SignalBuffer getSignalBuffer()
+	{
+		return signalBuffer;
+	}
+	
 	
 	//								512				  10240					10						10						150						5000
 	public MFCCProcessor(int samplesPerFrame, float sampleRate, int amountOfCepstrumCoef, int amountOfMelFilters, float lowerFilterFreq, float upperFilterFreq)
 	{
 		this.mfccProcessor = new MFCC(samplesPerFrame, sampleRate, amountOfCepstrumCoef, amountOfMelFilters, lowerFilterFreq, upperFilterFreq);
 		this.amountOfCepstrumCoef = amountOfCepstrumCoef;
+		this.signalBuffer = new SignalBuffer();
 		resetMFCCComputations();
 	}
 	
@@ -81,6 +90,8 @@ public class MFCCProcessor implements AudioProcessor
 		count++;
 		System.out.println("Adding MFCC vector " + count);
 		FeatureQueue.getInstance().addMFCCBuffer(mfcc);
+		
+		signalBuffer.setBuffer(mfcc);
 	}
 	
 	private void resetMFCCComputations()

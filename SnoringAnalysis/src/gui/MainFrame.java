@@ -121,14 +121,6 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		soundSourcePanel = new SoundSourcePanel();
 		mainPanel.add(soundSourcePanel, BorderLayout.NORTH);
 
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-		}
 	}
 
 	public void actionPerformed(ActionEvent arg0) {

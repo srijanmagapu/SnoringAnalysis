@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import gui.ISourcePanel.SoundSource;
 import gui.SignalGraph;
+import gui.graphs.AreaGraph;
 import gui.interfaces.ISignalGraph;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -78,25 +79,33 @@ public class DispatchManager implements IStartProcessingHandler
 		//filter
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
 		
-		//V-Box - TD Graph
+		//============  V-Box  ============
 		VerticalBoxProcessor vboxProcessor = new VerticalBoxProcessor();
 		
-		final ISignalGraph tdView = mainFrame.getIGraphsPanel().getTDGraphPanel();
-		final SignalBuffer tdBuffer = vboxProcessor.getSignalBuffer();
-		SignalGraphController tdControler = new SignalGraphController(tdView, tdBuffer);
-		
-		//Energy
+		//============  Energy  ============
 		STFTEnergyProcssor energyProcessor = new STFTEnergyProcssor(audioBufferSize, energyFreqBand, numOfEnergyBands);
 		energyProcessor.setIVerticalBoxProcessor(vboxProcessor);
 		
+		// TD graph
+		final ISignalGraph tdView = mainFrame.getIGraphsPanel().getTDGraphPanel();
+		final SignalBuffer tdBuffer = energyProcessor.getSignalTDBuffer();
+		SignalGraphController tdControler = new SignalGraphController(tdView, tdBuffer);
+		
+		// FD graph
+		final AreaGraph fdView = mainFrame.getIGraphsPanel().getFDGraphPanel();
+		final SignalBuffer fdBuffer = energyProcessor.getSignalFFTBuffer();
+		SignalGraphController fdControler = new SignalGraphController(fdView, fdBuffer);
+		
+		// Energy graph
 		final ISignalGraph energyView = mainFrame.getIGraphsPanel().getEnergyGraphPanel();
-		final SignalBuffer energyBuffer = energyProcessor.getSignalBuffer();
+		final SignalBuffer energyBuffer = energyProcessor.getSignalEnergyBuffer();
 		SignalGraphController energyControler = new SignalGraphController(energyView, energyBuffer);
 		
-		//MFCC
+		//============  MFCC  ============
 		MFCCProcessor mfccProcessor = new MFCCProcessor(audioBufferSize, sampleRate, amountOfCepstrumCoef, amountOfMelFilters, minFreq, maxFreq);
 		mfccProcessor.setIVerticalBoxProcessor(vboxProcessor);
 		
+		//MFCC graph
 		final ISignalGraph mfccView = mainFrame.getIGraphsPanel().getMFCCGraphPanel();
 		final SignalBuffer mfccBuffer = mfccProcessor.getSignalBuffer();
 		SignalGraphController mfccControler = new SignalGraphController(mfccView, mfccBuffer);
@@ -107,6 +116,7 @@ public class DispatchManager implements IStartProcessingHandler
 		
 		if(audioPlayer != null)
 			mainDispatcher.addAudioProcessor(audioPlayer);
+		
 		mainDispatcher.addAudioProcessor(bandPass);
 		mainDispatcher.addAudioProcessor(vboxProcessor);
 		mainDispatcher.addAudioProcessor(energyProcessor);

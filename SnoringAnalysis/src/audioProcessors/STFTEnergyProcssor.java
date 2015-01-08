@@ -1,5 +1,7 @@
 package audioProcessors;
 
+import java.util.ArrayList;
+
 import model.SignalBuffer;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
@@ -21,11 +23,28 @@ public class STFTEnergyProcssor implements AudioProcessor
 	//private final int numOfBands = 10;
 	private final int numOfBands;
 	
-	private final SignalBuffer signalBuffer;
+	private int overlap;
 	
-	public SignalBuffer getSignalBuffer()
+	private final int MAX_NUMBER_OF_SAMPLES = 3000;
+	private ArrayList<float[]> tdCumulativeBuffer;
+	private ArrayList<float[]> fdCumulativeBuffer;
+	
+	private final SignalBuffer signalEnergyBuffer;
+	public SignalBuffer getSignalEnergyBuffer()
 	{
-		return signalBuffer;
+		return signalEnergyBuffer;
+	}
+	
+	private final SignalBuffer signalTDBuffer;
+	public SignalBuffer getSignalTDBuffer()
+	{
+		return signalTDBuffer;
+	}
+	
+	private final SignalBuffer signalFFTBuffer;
+	public SignalBuffer getSignalFFTBuffer()
+	{
+		return signalFFTBuffer;
 	}
 	
 	/**
@@ -107,8 +126,11 @@ public class STFTEnergyProcssor implements AudioProcessor
 		this.freqBand = freqBand;
 		this.numOfBands = numOfBands;
 		
-		this.signalBuffer = new SignalBuffer();
 		this.fft = new FFT(bufferSize, new HammingWindow());
+
+		this.signalEnergyBuffer = new SignalBuffer();
+		this.signalTDBuffer = new SignalBuffer();
+		this.signalFFTBuffer = new SignalBuffer();
 
 		this.previousOutOfControlState = false;
 		resetEnergyComputations();
@@ -126,26 +148,34 @@ public class STFTEnergyProcssor implements AudioProcessor
 
 		if (vboxProcessor != null)
 			newOutOfControlState = vboxProcessor.getOutOfControl();
-
+		
 		if (newOutOfControlState)
 		{
 			if(!previousOutOfControlState)
 				resetEnergyComputations();
 			
+			overlap = audioEvent.getOverlap();
 			// event floatBuffer is reused so copy it to another array
 			float[] eventFloatBuffer = audioEvent.getFloatBuffer();
 			float[] transformBuffer = new float[bufferSize];
 			System.arraycopy(eventFloatBuffer, 0, transformBuffer, 0, eventFloatBuffer.length);
+			
+			//store copy of TD signal for following computations
+			tdCumulativeBuffer.add(transformBuffer.clone());
 
 			// apply fft
 			fft.forwardTransform(transformBuffer);
 
-			// get square amplitudes
+			// get square amplitudes for energy
 			float[] abs = new float[bufferSize / 2];
 			squareModulus(transformBuffer, abs);
 
 			// compute local energy
 			computeEnergy(abs);
+			
+			// get regular amplitudes for FD buffer
+			arraySqrt(abs);
+			fdCumulativeBuffer.add(abs);
 		}
 		else if(previousOutOfControlState)
 		{
@@ -166,6 +196,9 @@ public class STFTEnergyProcssor implements AudioProcessor
 	{
 		this.energy = new float[numOfBands];
 		this.overallEnergy = 0;
+		
+		this.tdCumulativeBuffer = new ArrayList<>();
+		this.fdCumulativeBuffer = new ArrayList<>();
 	}
 
 	/**
@@ -203,8 +236,62 @@ public class STFTEnergyProcssor implements AudioProcessor
 		count++;
 		System.out.println("Adding Energy vector " + count);
 		FeatureQueue.getInstance().addEnergyBuffer(energy);
+
+		//create signalTDBuffer
+		createTDBuffer();
 		
-		signalBuffer.setBuffer(energy);
+		//create signalFFTBuffer
+		createFDBuffer();
+		
+		//create energyBuffer
+		signalEnergyBuffer.setBuffer(energy);
+	}
+	
+	private void createFDBuffer()
+	{
+		float[] fdArray = new float[fdCumulativeBuffer.get(0).length];
+		
+		//sum elements
+		for(float[] arr : fdCumulativeBuffer)
+			for(int i = 0; i < arr.length; i++)
+				fdArray[i] += arr[i];
+		
+		int listSize = fdCumulativeBuffer.size();
+		//compute mean
+		for(int i = 0; i < fdArray.length; i++)
+			fdArray[i] /= listSize;
+		
+		signalFFTBuffer.setBuffer(fdArray);
+	}
+	
+	private void createTDBuffer()
+	{
+		int arraySize = tdCumulativeBuffer.get(0).length;
+		double step = 1.;
+		int numOfSamples = (arraySize - overlap) * (tdCumulativeBuffer.size())  + overlap;
+		
+		if(numOfSamples > MAX_NUMBER_OF_SAMPLES)
+			step = (int)Math.ceil(numOfSamples / (double)MAX_NUMBER_OF_SAMPLES);
+		
+		float[] cumulativeArray = new float[(int)Math.ceil(numOfSamples / step)];
+		int cumulativeIndex = 0;
+		double next = 0;
+		
+		//copy the array part that not overlapped by next array
+		for(float[] arr : tdCumulativeBuffer)
+		{
+			for(int i = 0; i < arraySize - overlap; next += step, i = (int)next)
+				cumulativeArray[cumulativeIndex++] = arr[i];
+			
+			next -= arraySize - overlap;
+		}
+		
+		//copy the last part of last array
+		float[] lastArray = tdCumulativeBuffer.get(tdCumulativeBuffer.size()-1);
+		for(int i = 0; i < arraySize - overlap; next += step, i = (int)next)
+			cumulativeArray[cumulativeIndex++] = lastArray[i];
+		
+		signalTDBuffer.setBuffer(cumulativeArray);
 	}
 
 	/**
@@ -233,6 +320,12 @@ public class STFTEnergyProcssor implements AudioProcessor
 		final int imgIndex = 2 * index + 1;
 		final float modulus = data[realIndex] * data[realIndex] + data[imgIndex] * data[imgIndex];
 		return modulus;
+	}
+	
+	private void arraySqrt(float[] data)
+	{
+		for(int i = 0; i < data.length; i++)
+			data[i] = (float)Math.sqrt(data[i]);
 	}
 
 	@Override

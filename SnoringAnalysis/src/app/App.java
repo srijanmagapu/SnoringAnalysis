@@ -46,7 +46,7 @@ public class App {
 		(new Thread(worker, "Worker")).start();
 		
 		DispatchManager dispatchManager = new DispatchManager();
-		dispatchManager.initDispatcher( new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(args[0])) ));
+		dispatchManager.initDispatcher( new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(args[2])) ));
 		
 		worker.stopWorker();
 	}

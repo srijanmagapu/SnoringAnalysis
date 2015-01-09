@@ -21,6 +21,7 @@ import controllers.IStartProcessingHandler;
 import controllers.SignalGraphController;
 import audioProcessors.DummyProcessor;
 import audioProcessors.MFCCProcessor;
+import audioProcessors.PreProcessor;
 import audioProcessors.STFTEnergyProcssor;
 import audioProcessors.VerticalBoxProcessor;
 import be.tarsos.dsp.AudioDispatcher;
@@ -30,7 +31,7 @@ import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 
-public class DispatchManager implements IStartProcessingHandler
+public class DispatchManager implements IStartProcessingHandler, Runnable
 {
 	private static final int windowSizeInMs = 50;
 	private static final int sampleRate = 10240;
@@ -55,15 +56,46 @@ public class DispatchManager implements IStartProcessingHandler
 	
 	private IMainFrame mainFrame;
 	
+	private JVMAudioInputStream stream;
+	private JVMAudioInputStream preProcessorStream;
+	
 	public DispatchManager(IMainFrame frame)
 	{
 		this.mainFrame = frame;
 		frame.getSourcePanel().registerStartStopHandler(this);
 	}
 	
-	public void initDispatcher(TarsosDSPAudioInputStream stream) throws UnsupportedAudioFileException
+
+	@Override
+	public void run()
 	{
+		try
+		{
+			double vboxHeight = preProcessAudio();
+			processAudio( vboxHeight );
+		}
+		catch (UnsupportedAudioFileException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private double preProcessAudio()
+	{
+		AudioDispatcher preProcessorDispatcher = new AudioDispatcher(preProcessorStream, audioBufferSize, 0);
 		
+		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
+		PreProcessor preProessor = new PreProcessor();
+		
+		preProcessorDispatcher.addAudioProcessor(bandPass);
+		preProcessorDispatcher.addAudioProcessor(preProessor);
+		preProcessorDispatcher.run();
+		
+		return preProessor.getCaculatedheight();
+	}
+	
+	public void processAudio( double vboxHeight ) throws UnsupportedAudioFileException
+	{
 		mainDispatcher = new AudioDispatcher(stream, audioBufferSize, bufferOverlap);
 		
 		AudioPlayer audioPlayer = null;
@@ -80,7 +112,7 @@ public class DispatchManager implements IStartProcessingHandler
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
 		
 		//============  V-Box  ============
-		VerticalBoxProcessor vboxProcessor = new VerticalBoxProcessor();
+		VerticalBoxProcessor vboxProcessor = new VerticalBoxProcessor((float) vboxHeight);
 		
 		//============  Energy  ============
 		STFTEnergyProcssor energyProcessor = new STFTEnergyProcssor(audioBufferSize, energyFreqBand, numOfEnergyBands);
@@ -123,8 +155,7 @@ public class DispatchManager implements IStartProcessingHandler
 		mainDispatcher.addAudioProcessor(mfccProcessor);
 		mainDispatcher.addAudioProcessor(dummyProcessor);
 		
-		mainDispatcherThread = new Thread(mainDispatcher);
-		mainDispatcherThread.start();
+		mainDispatcher.run();
 	}
 
 	@Override
@@ -135,13 +166,16 @@ public class DispatchManager implements IStartProcessingHandler
 			switch(source)
 			{
 			case File:
-				initDispatcher(new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) ));
+				preProcessorStream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
+				stream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
+				
 				break;
 				
 			case Mic:
-				initDispatcher(new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) ));
 				break;
 			}
+			
+			(new Thread(this)).start();
 		}
 		catch(UnsupportedAudioFileException ex)
 		{

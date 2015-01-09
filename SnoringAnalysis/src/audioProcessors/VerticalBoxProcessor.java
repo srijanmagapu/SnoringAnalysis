@@ -27,8 +27,9 @@ public class VerticalBoxProcessor implements IVerticalBoxProcessor
 		return signalBuffer;
 	}
 	
-	public VerticalBoxProcessor()
+	public VerticalBoxProcessor( float boxHeight )
 	{
+		this.boxHeight = boxHeight;
 		this.signalBuffer = new SignalBuffer();
 	}
 	

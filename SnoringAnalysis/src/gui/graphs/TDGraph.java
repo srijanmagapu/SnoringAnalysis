@@ -5,6 +5,7 @@ import gui.interfaces.ISignalGraph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -18,16 +19,20 @@ public class TDGraph extends ChartPanel implements ISignalGraph
 	private XYSeries xySeries;
 	private JFreeChart chart;
 	
-	public TDGraph(JFreeChart chart, String name)
+	public TDGraph(JFreeChart dummyChart, String name)
 	{
-		super(chart);
+		super(dummyChart);
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), name, TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
 
 		xySeries = new XYSeries("");
 		XYSeriesCollection dataset = new XYSeriesCollection(xySeries);
 		chart = ChartFactory.createTimeSeriesChart("", "", "", dataset);
 		chart.removeLegend();
-		chart.getXYPlot().getDomainAxis().setAxisLineVisible(false);
+		
+		//NumberAxis areaRangeAxis = (NumberAxis) chart.getXYPlot().getRangeAxis();
+		//areaRangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+		//areaRangeAxis.setAutoRangeIncludesZero(false);
+		
 		this.setChart(chart);
 	}
 	

@@ -3,22 +3,15 @@ package app;
 import gui.MainFrame;
 
 import java.awt.EventQueue;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.UIManager;
 
 import utils.Constants;
-import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 import businessLayer.DBCreator;
 import businessLayer.FeatureQueue;
-import businessLayer.FeatureProcessor;
 import businessLayer.FeatureWorker;
-import audioProcessors.GraphBuilder;
-import audioProcessors.EnergyProcessors.EnergyDispatcher;
 
 public class App {
 	

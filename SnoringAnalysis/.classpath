@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="lib/ojalgo-37.0.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.carbon.macosx-3.3.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/clodhopper-core"/>
+	<classpathentry kind="lib" path="lib/opencsv-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

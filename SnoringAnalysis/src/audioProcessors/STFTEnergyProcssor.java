@@ -286,9 +286,10 @@ public class STFTEnergyProcssor implements AudioProcessor
 			next -= arraySize - overlap;
 		}
 		
+		next = arraySize - overlap + next;
 		//copy the last part of last array
 		float[] lastArray = tdCumulativeBuffer.get(tdCumulativeBuffer.size()-1);
-		for(int i = 0; i < arraySize - overlap; next += step, i = (int)next)
+		for(int i = (int)next; i < arraySize; next += step, i = (int)next)
 			cumulativeArray[cumulativeIndex++] = lastArray[i];
 		
 		signalTDBuffer.setBuffer(cumulativeArray);

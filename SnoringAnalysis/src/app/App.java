@@ -23,10 +23,6 @@ public class App {
 		}
 		catch(Exception e){}
 		
-		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
-		worker.setIConsumer(new DBCreator(Constants.numOfDimensions, Constants.numOfClusters));
-		(new Thread(worker, "Worker")).start();
-		
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()

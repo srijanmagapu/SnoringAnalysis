@@ -1,9 +1,9 @@
-package app;
+package gui.interfaces;
 
-import gui.ISourcePanel;
 
 public interface IMainFrame
 {
 	public IGraphsPanel getIGraphsPanel();
 	public ISourcePanel getSourcePanel();
+	public IProgressBar getIProgressBar();
 }

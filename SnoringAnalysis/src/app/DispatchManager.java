@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import gui.ISourcePanel.SoundSource;
 import gui.SignalGraph;
 import gui.graphs.AreaGraph;
+import gui.interfaces.IMainFrame;
+import gui.interfaces.IProgressBar;
 import gui.interfaces.ISignalGraph;
+import gui.interfaces.ISourcePanel.SoundSource;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -16,8 +18,11 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import utils.Constants;
+import model.ProgressData;
 import model.SignalBuffer;
 import controllers.IStartProcessingHandler;
+import controllers.ProcessProgressController;
 import controllers.SignalGraphController;
 import audioProcessors.DummyProcessor;
 import audioProcessors.MFCCProcessor;
@@ -30,6 +35,9 @@ import be.tarsos.dsp.filters.BandPass;
 import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
+import businessLayer.DBCreator;
+import businessLayer.FeatureQueue;
+import businessLayer.FeatureWorker;
 
 public class DispatchManager implements IStartProcessingHandler, Runnable
 {
@@ -83,7 +91,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 	private double preProcessAudio()
 	{
 		AudioDispatcher preProcessorDispatcher = new AudioDispatcher(preProcessorStream, audioBufferSize, 0);
-		
+
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
 		PreProcessor preProessor = new PreProcessor();
 		
@@ -91,6 +99,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 		preProcessorDispatcher.addAudioProcessor(preProessor);
 		preProcessorDispatcher.run();
 		
+		preProcessorDispatcher.stop();
 		return preProessor.getCaculatedheight();
 	}
 	
@@ -108,7 +117,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 			e.printStackTrace();
 		}	
 
-		//filter
+		// Filter
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
 		
 		//============  V-Box  ============
@@ -146,6 +155,12 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 		dummyProcessor = new DummyProcessor();
 		dummyProcessor.setInterruptProcessing(false);
 		
+		final IProgressBar progressBarView = mainFrame.getIProgressBar();
+		final ProgressData progressData = dummyProcessor.getProgressData();
+		ProcessProgressController progressController = new ProcessProgressController(progressBarView, progressData);
+		
+		
+		//============  add processors  ============
 		if(audioPlayer != null)
 			mainDispatcher.addAudioProcessor(audioPlayer);
 		
@@ -156,6 +171,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 		mainDispatcher.addAudioProcessor(dummyProcessor);
 		
 		mainDispatcher.run();
+		mainDispatcher.stop();
 	}
 
 	@Override
@@ -175,7 +191,13 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 				break;
 			}
 			
-			(new Thread(this)).start();
+			FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
+			worker.setIConsumer(new DBCreator(Constants.numOfDimensions, Constants.numOfClusters));
+			(new Thread(worker, "FeatureWorker")).start();
+			
+			Thread t = new Thread(this, "DispatchManager");
+			System.out.println(t.getName() + " : " + t.getId());
+			t.start();
 		}
 		catch(UnsupportedAudioFileException ex)
 		{

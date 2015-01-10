@@ -16,8 +16,8 @@ import gui.graphs.TDGraph;
 
 import org.jfree.chart.JFreeChart;
 
-import app.IGraphsPanel;
 import gui.graphs.AreaGraph;
+import gui.interfaces.IGraphsPanel;
 
 public class GraphsPanel extends JPanel implements IGraphsPanel
 {

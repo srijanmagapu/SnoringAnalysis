@@ -1,5 +1,10 @@
 package gui;
 
+import gui.interfaces.IGraphsPanel;
+import gui.interfaces.IMainFrame;
+import gui.interfaces.IProgressBar;
+import gui.interfaces.ISourcePanel;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -20,11 +25,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.ButtonGroup;
 
-import app.DispatchManager;
-import app.IGraphsPanel;
-import app.IMainFrame;
+import org.eclipse.swt.widgets.ProgressBar;
 
-public class MainFrame extends JFrame implements ActionListener, IMainFrame
+import app.DispatchManager;
+
+public class MainFrame extends JFrame implements ActionListener, IMainFrame, IProgressBar
 {
 
 	private JPanel contentPane;
@@ -46,6 +51,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	private GraphsPanel graphsPanel;
 	private JPanel cardPanel;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JProgressBar progressBar;
 
 
 	/**
@@ -104,7 +110,8 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 
-		JProgressBar progressBar = new JProgressBar();
+		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
 		contentPane.add(progressBar, BorderLayout.SOUTH);
 		
 		mainPanel = new JPanel();
@@ -141,5 +148,16 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	{
 		return soundSourcePanel;
 	}
+
+	@Override
+	public IProgressBar getIProgressBar()
+	{
+		return this;
+	}
 	
+	@Override
+	public void setProgressValue(int percent)
+	{
+		progressBar.setValue(percent);
+	}
 }

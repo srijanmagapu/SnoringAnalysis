@@ -26,8 +26,8 @@ public class TDGraph extends ChartPanel implements ISignalGraph
 
 		xySeries = new XYSeries("");
 		XYSeriesCollection dataset = new XYSeriesCollection(xySeries);
-		chart = ChartFactory.createTimeSeriesChart("", "", "", dataset);
-		chart.removeLegend();
+		chart = ChartFactory.createTimeSeriesChart("", "", "", dataset, false, true, true);
+		//chart.removeLegend();
 		
 		//NumberAxis areaRangeAxis = (NumberAxis) chart.getXYPlot().getRangeAxis();
 		//areaRangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());

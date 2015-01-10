@@ -1,4 +1,4 @@
-package app;
+package gui.interfaces;
 
 import gui.graphs.AreaGraph;
 import gui.graphs.TDGraph;

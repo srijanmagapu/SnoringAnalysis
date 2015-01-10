@@ -1,6 +1,6 @@
 package controllers;
 
-import gui.ISourcePanel;
+import gui.interfaces.ISourcePanel;
 
 public interface IStartProcessingHandler
 {

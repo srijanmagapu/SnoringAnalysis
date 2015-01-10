@@ -1,5 +1,7 @@
 package gui;
 
+import gui.interfaces.ISourcePanel;
+
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;

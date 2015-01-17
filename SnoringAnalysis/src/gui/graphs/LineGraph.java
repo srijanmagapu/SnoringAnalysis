@@ -5,6 +5,7 @@ import gui.interfaces.ISignalGraph;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -13,13 +14,18 @@ import javax.swing.border.TitledBorder;
 import javax.swing.border.LineBorder;
 
 import java.awt.Color;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
-public class TDGraph extends ChartPanel implements ISignalGraph
+public class LineGraph extends ChartPanel implements ISignalGraph
 {
+	private static final long serialVersionUID = 8215031469382849566L;
+	
 	private XYSeries xySeries;
 	private JFreeChart chart;
 	
-	public TDGraph(JFreeChart dummyChart, String name)
+	public LineGraph(JFreeChart dummyChart, String name)
 	{
 		super(dummyChart);
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), name, TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
@@ -29,54 +35,27 @@ public class TDGraph extends ChartPanel implements ISignalGraph
 		chart = ChartFactory.createTimeSeriesChart("", "", "", dataset, false, true, true);
 		//chart.removeLegend();
 		
+		DateAxis axis = (DateAxis) chart.getXYPlot().getDomainAxis();
+		axis.setDateFormatOverride(new SimpleDateFormat(""));
+		
 		//NumberAxis areaRangeAxis = (NumberAxis) chart.getXYPlot().getRangeAxis();
-		//areaRangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		//areaRangeAxis.setAutoRangeIncludesZero(false);
+		//areaRangeAxis.setNumberFormatOverride(new MillisecondsSpendNumberFormat());
+		//areaRangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits(locale));
 		
 		this.setChart(chart);
 	}
-	
 
-	
 	@Override
-	public void setData(float[] yData, float sampleRate)
+	public void setData(double[] xData, double[] yData)
 	{
-		sampleRate = 1;
-		double[] doubleData = new double[yData.length];
-		for (int i = 0; i < yData.length; i++)
-			doubleData[i] = yData[i];
-
-		setData(doubleData, sampleRate);
-	}
-	/*public void setData(float[] yData, float sampleRate)
-	{
-		double[] doubleData = new double[yData.length];
-		for (int i = 0; i < yData.length; i++)
-			doubleData[i] = yData[i];
-
-		setData(doubleData, sampleRate);
-	}*/
-	
-	private void setData(double[] yData, float sampleRate)
-	{
-		double[] xData = createXData(yData.length, sampleRate);
-		
 		xySeries.clear();
 		xySeries.setNotify(false);
-		for(int i=0; i< yData.length; i++)
+		
+		for(int i = 0; i < yData.length; i++)
 			xySeries.add(xData[i], yData[i]);
 
 		xySeries.setNotify(true);
 	}
-	
-	private double[] createXData(int size, float sampleRate)
-	{
-		double[] data = new double[size];
-		for (int i = 0; i < size; i++)
-			data[i] = i / sampleRate;
-
-		return data;
-	}
-
 
 }

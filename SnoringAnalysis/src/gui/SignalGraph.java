@@ -15,7 +15,7 @@ public class SignalGraph extends LineChart implements ISignalGraph
 	}
 
 	@Override
-	public void setData(float[] data, float arg)
+	public void setData(double[] xData, double[] yData)
 	{
 		// TODO Auto-generated method stub
 		

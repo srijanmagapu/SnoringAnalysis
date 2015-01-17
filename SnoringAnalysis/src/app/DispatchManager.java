@@ -17,10 +17,14 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import utils.Constants;
 import model.ProgressData;
 import model.SignalBuffer;
+import controllers.EnergyGraphController;
+import controllers.FDGraphController;
 import controllers.IStartProcessingHandler;
 import controllers.ProcessProgressController;
 import controllers.SignalGraphController;
@@ -36,10 +40,13 @@ import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 import businessLayer.DBCreator;
+import businessLayer.FeatureProcessor;
 import businessLayer.FeatureQueue;
 import businessLayer.FeatureWorker;
+import businessLayer.IFeatureConsumer;
+import businessLayer.IModeSwitcher;
 
-public class DispatchManager implements IStartProcessingHandler, Runnable
+public class DispatchManager implements IStartProcessingHandler, Runnable, IModeSwitcher
 {
 	private static final int windowSizeInMs = 50;
 	private static final int sampleRate = 10240;
@@ -61,6 +68,8 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 	private AudioDispatcher mainDispatcher;
 	private Thread mainDispatcherThread;
 	private DummyProcessor dummyProcessor;
+	
+	private Mode processingMode = Mode.Analyzing;
 	
 	private IMainFrame mainFrame;
 	
@@ -135,12 +144,13 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 		// FD graph
 		final AreaGraph fdView = mainFrame.getIGraphsPanel().getFDGraphPanel();
 		final SignalBuffer fdBuffer = energyProcessor.getSignalFFTBuffer();
-		SignalGraphController fdControler = new SignalGraphController(fdView, fdBuffer);
+		FDGraphController fdControler = new FDGraphController(fdView, fdBuffer);
+		fdControler.setFFT(energyProcessor.getFFT());
 		
 		// Energy graph
-		final ISignalGraph energyView = mainFrame.getIGraphsPanel().getEnergyGraphPanel();
+		final AreaGraph energyView = mainFrame.getIGraphsPanel().getEnergyGraphPanel();
 		final SignalBuffer energyBuffer = energyProcessor.getSignalEnergyBuffer();
-		SignalGraphController energyControler = new SignalGraphController(energyView, energyBuffer);
+		EnergyGraphController energyControler = new EnergyGraphController(energyView, energyBuffer);
 		
 		//============  MFCC  ============
 		MFCCProcessor mfccProcessor = new MFCCProcessor(audioBufferSize, sampleRate, amountOfCepstrumCoef, amountOfMelFilters, minFreq, maxFreq);
@@ -192,9 +202,31 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 			}
 			
 			FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
-			worker.setIConsumer(new DBCreator(Constants.numOfDimensions, Constants.numOfClusters));
+			
+			IFeatureConsumer iConsumer = null;
+			switch (processingMode)
+			{
+			case Training:
+				iConsumer = new DBCreator(Constants.numOfDimensions, Constants.numOfClusters);
+				break;
+			case Analyzing:
+				iConsumer = new FeatureProcessor(Constants.numOfDimensions, Constants.numOfClusters);
+				break;
+			}
+			
+			worker.setIConsumer(iConsumer);
 			(new Thread(worker, "FeatureWorker")).start();
 			
+			/*SwingUtilities.invokeLater(new SwingWorker(){
+
+				@Override
+				protected Object doInBackground() throws Exception
+				{
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+			});*/
 			Thread t = new Thread(this, "DispatchManager");
 			System.out.println(t.getName() + " : " + t.getId());
 			t.start();
@@ -213,5 +245,12 @@ public class DispatchManager implements IStartProcessingHandler, Runnable
 	public void stopProcessing()
 	{
 		dummyProcessor.setInterruptProcessing(true);
+	}
+
+
+	@Override
+	public void switchMode(Mode mode)
+	{
+		this.processingMode = mode;
 	}
 }

@@ -29,7 +29,7 @@ public class DummyProcessor implements AudioProcessor
 	@Override
 	public boolean process(AudioEvent audioEvent)
 	{
-		 p = audioEvent.getProgress();
+		p = audioEvent.getProgress();
 		progress.setProgress((int)Math.ceil(100 * audioEvent.getProgress()));
 		// return false to interrupt processing
 		return !interruptProcessing;

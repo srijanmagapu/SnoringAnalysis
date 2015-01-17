@@ -5,22 +5,25 @@ import java.util.Observer;
 
 import javax.swing.SwingUtilities;
 
+import gui.interfaces.IAreaSignalGraph;
 import model.SignalBuffer;
-import gui.interfaces.ISignalGraph;
 
-public class SignalGraphController implements Observer
+public class EnergyGraphController implements Observer
 {
-	private ISignalGraph view;
+	private IAreaSignalGraph view;
 	private SignalBuffer buffer;
 	
-	public SignalGraphController(ISignalGraph view, SignalBuffer buffer)
+	public EnergyGraphController(IAreaSignalGraph view, SignalBuffer buffer)
 	{
 		this.view = view;
 		this.buffer = buffer;
 		
 		this.buffer.addObserver(this);
+		
+		this.view.setBottomLine(0);
 	}
 
+	
 	@Override
 	public void update(Observable sender, Object params)
 	{
@@ -28,7 +31,7 @@ public class SignalGraphController implements Observer
             public void run()
 			{
             	float[] buffer = ((SignalBuffer)sender).getBuffer();
-				view.setData(createXData(buffer), createYData(buffer));
+            	view.setData(createXData(buffer), createYData(buffer));
 			}
 		});
 	}
@@ -52,4 +55,5 @@ public class SignalGraphController implements Observer
 		
 		return yData;
 	}
+
 }

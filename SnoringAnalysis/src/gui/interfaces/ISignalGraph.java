@@ -2,5 +2,5 @@ package gui.interfaces;
 
 public interface ISignalGraph
 {
-	public void setData(float[] data, float arg);
+	public void setData(double[] xData, double[] yData);
 }

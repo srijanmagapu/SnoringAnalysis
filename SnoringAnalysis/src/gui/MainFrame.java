@@ -32,6 +32,8 @@ import app.DispatchManager;
 public class MainFrame extends JFrame implements ActionListener, IMainFrame, IProgressBar
 {
 
+	private static final long serialVersionUID = -3268929758235757177L;
+	
 	private JPanel contentPane;
 	private JPanel mainPanel;
 	private SoundSourcePanel soundSourcePanel;

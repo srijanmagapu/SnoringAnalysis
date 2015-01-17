@@ -1,12 +1,12 @@
 package gui.interfaces;
 
 import gui.graphs.AreaGraph;
-import gui.graphs.TDGraph;
+import gui.graphs.LineGraph;
 
 public interface IGraphsPanel
 {
-	public TDGraph getTDGraphPanel();
+	public LineGraph getTDGraphPanel();
+	public LineGraph getMFCCGraphPanel();
 	public AreaGraph getFDGraphPanel();
-	public TDGraph getMFCCGraphPanel();
-	public TDGraph getEnergyGraphPanel();
+	public AreaGraph getEnergyGraphPanel();
 }

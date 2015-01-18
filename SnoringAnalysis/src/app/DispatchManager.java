@@ -69,7 +69,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	private Thread mainDispatcherThread;
 	private DummyProcessor dummyProcessor;
 	
-	private Mode processingMode = Mode.Analyzing;
+	private Mode processingMode = Mode.Training;
 	
 	private IMainFrame mainFrame;
 	

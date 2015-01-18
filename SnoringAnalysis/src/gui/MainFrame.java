@@ -4,6 +4,7 @@ import gui.interfaces.IGraphsPanel;
 import gui.interfaces.IMainFrame;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISourcePanel;
+import gui.settingsWindow.SettingsWindow;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -12,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JButton;
 import javax.swing.JProgressBar;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -28,6 +30,14 @@ import javax.swing.ButtonGroup;
 import org.eclipse.swt.widgets.ProgressBar;
 
 import app.DispatchManager;
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+
+import javax.swing.KeyStroke;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class MainFrame extends JFrame implements ActionListener, IMainFrame, IProgressBar
 {
@@ -70,6 +80,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame, IPr
 		setJMenuBar(menuBar);
 		
 		mnFile = new JMenu("File");
+		mnFile.setMnemonic('F');
 		menuBar.add(mnFile);
 		
 		mntmOpen = new JMenuItem("Open");
@@ -82,29 +93,39 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame, IPr
 		mnFile.add(mntmExit);
 		
 		mnView = new JMenu("View");
+		mnView.setMnemonic('V');
 		menuBar.add(mnView);
 		
 		rdbtnmntmPatient = new JRadioButtonMenuItem("Patient");
+		rdbtnmntmPatient.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK));
 		buttonGroup.add(rdbtnmntmPatient);
 		mnView.add(rdbtnmntmPatient);
 		
 		rdbtnmntmResearcher = new JRadioButtonMenuItem("Researcher");
+		rdbtnmntmResearcher.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 		buttonGroup.add(rdbtnmntmResearcher);
 		mnView.add(rdbtnmntmResearcher);
 		
 		mnTools = new JMenu("Tools");
+		mnTools.setMnemonic('T');
 		menuBar.add(mnTools);
 		
 		mntmClusterring = new JMenuItem("Clusterring");
+		mntmClusterring.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		mnTools.add(mntmClusterring);
 		
 		mntmPreferences = new JMenuItem("Preferences");
+		mntmPreferences.addActionListener(this);
+		mntmPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		mnTools.add(mntmPreferences);
 		
 		mnHelp = new JMenu("Help");
+		mnHelp.setMnemonic('H');
 		menuBar.add(mnHelp);
 		
 		mntmAbout = new JMenuItem("About");
+		mntmAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+		mntmAbout.setActionCommand(mntmAbout.getText());
 		mntmAbout.addActionListener(this);
 		mnHelp.add(mntmAbout);
 		contentPane = new JPanel();
@@ -132,11 +153,23 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame, IPr
 
 	}
 
-	public void actionPerformed(ActionEvent arg0) {
-		About about = new About();
-		about.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		about.setLocationRelativeTo(this);
-		about.setVisible(true);
+	public void actionPerformed(ActionEvent e) {
+		
+		JMenuItem button = (JMenuItem)e.getSource();
+		String action = button.getActionCommand();
+		
+		if(action.equals(mntmPreferences.getText()))
+		{
+			SettingsWindow settingsWindow  = new SettingsWindow();
+			settingsWindow.setVisible(true);
+		}
+		else if(action.equals(mntmAbout.getText()))
+		{
+			About about = new About();
+			about.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			about.setLocationRelativeTo(this);
+			about.setVisible(true);
+		}
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package gui;
 
+import gui.interfaces.IPlaySoundSwitcher;
 import gui.interfaces.ISourcePanel;
 
 import javax.swing.JFileChooser;
@@ -39,11 +40,19 @@ import controllers.IStartProcessingHandler;
 
 import java.awt.Component;
 
-public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorListener, ComponentListener, ActionListener, MouseListener
+import javax.swing.BoxLayout;
+
+import java.awt.BorderLayout;
+
+import javax.swing.JCheckBox;
+
+import java.awt.Dimension;
+
+public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionListener, MouseListener
 {
 	private SoundSource DEFAULT_SOUNDSOURCE = SoundSource.File;
 	private String DEFAULT_FOLDER = "sounds";
-	
+
 	private JTextField filePathTextField;
 	private File chosenFile;
 	private SoundSource soundSource = DEFAULT_SOUNDSOURCE;
@@ -52,65 +61,87 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorLi
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JButton btnBrowse;
 	private JButton btnStartStop;
-	private Box horizontalBox;
-	private Component horizontalStrut;
-	private Component horizontalStrut_1;
 
 	ArrayList<IStartProcessingHandler> startHandlers;
+	ArrayList<IPlaySoundSwitcher> playSoundSwitcher;
+	private JPanel leftPanel;
+	private JPanel rightPanel;
+	private JPanel centerPanel;
+	private Component verticalStrut;
+	private Component verticalStrut_1;
+	private JCheckBox chckBoxPlaySound;
 
 	/**
 	 * Create the panel.
 	 */
 	public SoundSourcePanel()
 	{
-		addComponentListener(this);
-		addAncestorListener(this);
-
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Source", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		setLayout(new BorderLayout(0, 0));
+
+		leftPanel = new JPanel();
+		add(leftPanel, BorderLayout.WEST);
 
 		rdbtnMic = new JRadioButton("Microphone");
+		leftPanel.add(rdbtnMic);
 		rdbtnMic.addActionListener(this);
 		buttonGroup.add(rdbtnMic);
 
 		rdbtnFile = new JRadioButton("File");
+		leftPanel.add(rdbtnFile);
 		rdbtnFile.addActionListener(this);
 		rdbtnFile.setSelected(true);
 		buttonGroup.add(rdbtnFile);
 
-		horizontalBox = Box.createHorizontalBox();
-
 		btnBrowse = new JButton("Browse");
+		leftPanel.add(btnBrowse);
 		btnBrowse.addActionListener(this);
-		horizontalBox.add(btnBrowse);
 		btnBrowse.addMouseListener(this);
 
-		horizontalStrut = Box.createHorizontalStrut(10);
-		horizontalBox.add(horizontalStrut);
+		rightPanel = new JPanel();
+		add(rightPanel, BorderLayout.EAST);
+
+		btnStartStop = new JButton("Start");
+		rightPanel.add(btnStartStop);
+
+		chckBoxPlaySound = new JCheckBox("Play sound");
+		chckBoxPlaySound.addActionListener(this);
+		rightPanel.add(chckBoxPlaySound);
+		btnStartStop.addMouseListener(this);
+
+		centerPanel = new JPanel();
+		add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setLayout(new BorderLayout(0, 0));
 
 		filePathTextField = new JTextField();
-		horizontalBox.add(filePathTextField);
+		centerPanel.add(filePathTextField);
+		filePathTextField.setMaximumSize(new Dimension(2147483647, 20));
 		filePathTextField.setEditable(false);
 		filePathTextField.setColumns(10);
 
-		horizontalStrut_1 = Box.createHorizontalStrut(20);
-		horizontalBox.add(horizontalStrut_1);
+		verticalStrut = Box.createVerticalStrut(7);
+		centerPanel.add(verticalStrut, BorderLayout.NORTH);
 
-		btnStartStop = new JButton("Start");
-		btnStartStop.addMouseListener(this);
-		horizontalBox.add(btnStartStop);
-		setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-		add(rdbtnMic);
-		add(rdbtnFile);
-		add(horizontalBox);
+		verticalStrut_1 = Box.createVerticalStrut(7);
+		centerPanel.add(verticalStrut_1, BorderLayout.SOUTH);
 	}
 
 	@Override
 	public void registerStartStopHandler(IStartProcessingHandler startHandler)
 	{
-		if (startHandlers == null)
-			startHandlers = new ArrayList<>();
+		if (startHandlers == null) startHandlers = new ArrayList<>();
 
 		startHandlers.add(startHandler);
+	}
+	
+
+	@Override
+	public void registerPlaySoundSwither(IPlaySoundSwitcher switcher)
+	{
+		if(playSoundSwitcher == null)
+			playSoundSwitcher = new ArrayList<>();
+		
+		playSoundSwitcher.add(switcher);
 	}
 
 	public void resetChosenFile()
@@ -134,15 +165,6 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorLi
 		return this.soundSource;
 	}
 
-	public void ancestorAdded(AncestorEvent event)
-	{
-		horizontalBox.setSize((int) event.getComponent().getWidth() - horizontalBox.getX() - 20, horizontalBox.getHeight());
-	}
-
-	public void componentResized(ComponentEvent arg0)
-	{
-		horizontalBox.setSize((int) arg0.getComponent().getWidth() - horizontalBox.getX() - 20, horizontalBox.getHeight());
-	}
 
 	public void actionPerformed(ActionEvent e)
 	{
@@ -174,28 +196,37 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorLi
 				}
 			}
 		}
+		else if(source == chckBoxPlaySound)
+		{
+			for(IPlaySoundSwitcher sw : playSoundSwitcher)
+			{
+				sw.switchSound(chckBoxPlaySound.isSelected());
+			}
+		}
 	}
 
 	public void mouseClicked(MouseEvent event)
 	{
 		JButton button = (JButton) event.getSource();
-		//start/stop
+		// start/stop
 		if (button == btnStartStop)
 		{
 			String btnText = button.getText();
 			switch (btnText)
 			{
 			case "Start":
-				if (startHandlers != null){
+				if (startHandlers != null)
+				{
 					button.setText("Stop");
 					for (IStartProcessingHandler handler : startHandlers)
 						handler.startProcessing(getSoundSource(), getChosenFileName());
-					
+
 				}
 				break;
 
 			case "Stop":
-				if (startHandlers != null){
+				if (startHandlers != null)
+				{
 					button.setText("Start");
 					for (IStartProcessingHandler handler : startHandlers)
 						handler.stopProcessing();
@@ -203,7 +234,7 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, AncestorLi
 				break;
 			}
 		}
-		//browse
+		// browse
 		else if (button == btnBrowse)
 		{
 			final JFileChooser fc = new JFileChooser();

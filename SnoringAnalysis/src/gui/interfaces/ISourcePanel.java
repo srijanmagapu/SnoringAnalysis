@@ -10,4 +10,5 @@ public interface ISourcePanel
 	}
 	
 	public void registerStartStopHandler(IStartProcessingHandler startHandler);
+	public void registerPlaySoundSwither(IPlaySoundSwitcher switcher);
 }

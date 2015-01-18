@@ -2,23 +2,17 @@ package app;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-import gui.SignalGraph;
 import gui.graphs.AreaGraph;
 import gui.interfaces.IMainFrame;
+import gui.interfaces.IPlaySoundSwitcher;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISignalGraph;
 import gui.interfaces.ISourcePanel.SoundSource;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 import utils.Constants;
 import model.ProgressData;
@@ -32,12 +26,10 @@ import audioProcessors.DummyProcessor;
 import audioProcessors.MFCCProcessor;
 import audioProcessors.PreProcessor;
 import audioProcessors.STFTEnergyProcssor;
+import audioProcessors.SwitchableAudioPlayer;
 import audioProcessors.VerticalBoxProcessor;
 import be.tarsos.dsp.AudioDispatcher;
-import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.filters.BandPass;
-import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
-import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 import businessLayer.DBCreator;
 import businessLayer.FeatureProcessor;
@@ -46,7 +38,7 @@ import businessLayer.FeatureWorker;
 import businessLayer.IFeatureConsumer;
 import businessLayer.IModeSwitcher;
 
-public class DispatchManager implements IStartProcessingHandler, Runnable, IModeSwitcher
+public class DispatchManager implements IStartProcessingHandler, Runnable, IModeSwitcher, IPlaySoundSwitcher
 {
 	private static final int windowSizeInMs = 50;
 	private static final int sampleRate = 10240;
@@ -71,6 +63,9 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	
 	private Mode processingMode = Mode.Training;
 	
+	private boolean playAudio;
+	private SwitchableAudioPlayer audioPlayer = null;
+	
 	private IMainFrame mainFrame;
 	
 	private JVMAudioInputStream stream;
@@ -80,6 +75,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	{
 		this.mainFrame = frame;
 		frame.getSourcePanel().registerStartStopHandler(this);
+		frame.getSourcePanel().registerPlaySoundSwither(this);
 	}
 	
 
@@ -115,18 +111,8 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	public void processAudio( double vboxHeight ) throws UnsupportedAudioFileException
 	{
 		mainDispatcher = new AudioDispatcher(stream, audioBufferSize, bufferOverlap);
-		
-		AudioPlayer audioPlayer = null;
-		try
-		{
-			audioPlayer = new AudioPlayer(JVMAudioInputStream.toAudioFormat(mainDispatcher.getFormat()));
-		}
-		catch (LineUnavailableException e)
-		{
-			e.printStackTrace();
-		}	
 
-		// Filter
+		//============  Filter  ===========
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
 		
 		//============  V-Box  ============
@@ -169,7 +155,17 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		final ProgressData progressData = dummyProcessor.getProgressData();
 		ProcessProgressController progressController = new ProcessProgressController(progressBarView, progressData);
 		
-		
+		//Audio Player
+		try
+		{
+			audioPlayer = new SwitchableAudioPlayer(JVMAudioInputStream.toAudioFormat(mainDispatcher.getFormat()));
+			audioPlayer.setPlayAudio(playAudio);
+		}
+		catch (LineUnavailableException e)
+		{
+			e.printStackTrace();
+		}
+
 		//============  add processors  ============
 		if(audioPlayer != null)
 			mainDispatcher.addAudioProcessor(audioPlayer);
@@ -182,6 +178,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		
 		mainDispatcher.run();
 		mainDispatcher.stop();
+		
 	}
 
 	@Override
@@ -252,5 +249,15 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	public void switchMode(Mode mode)
 	{
 		this.processingMode = mode;
+	}
+
+
+	@Override
+	public void switchSound(boolean enable)
+	{
+		playAudio = enable;
+		
+		if(audioPlayer != null)
+			audioPlayer.setPlayAudio(enable);
 	}
 }

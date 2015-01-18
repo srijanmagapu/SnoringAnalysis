@@ -3,10 +3,12 @@ package businessLayer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import model.AudioFeature;
+
 public class FeatureQueue
 {
-	private BlockingQueue<float[]> energyBuffer = new LinkedBlockingQueue<>();
-	private BlockingQueue<float[]> mfccBuffer = new LinkedBlockingQueue<>();
+	private BlockingQueue<AudioFeature> energyBuffer = new LinkedBlockingQueue<AudioFeature>();
+	private BlockingQueue<AudioFeature> mfccBuffer = new LinkedBlockingQueue<AudioFeature>();
 	
 	private static FeatureQueue instance;
 	private FeatureQueue(){}
@@ -18,22 +20,22 @@ public class FeatureQueue
 		return instance;
 	}
 	
-	public boolean addEnergyBuffer(float[] energy)
+	public boolean addEnergyBuffer(AudioFeature e)
 	{
-		return energyBuffer.add(energy);
+		return energyBuffer.add(e);
 	}
 	
-	public boolean addMFCCBuffer(float[] mfcc)
+	public boolean addMFCCBuffer(AudioFeature e)
 	{
-		return mfccBuffer.add(mfcc);
+		return mfccBuffer.add(e);
 	}
 	
-	public float[] takeEnergyBuffer() throws InterruptedException
+	public AudioFeature takeEnergyBuffer() throws InterruptedException
 	{
 		return energyBuffer.take();
 	}
 	
-	public float[] takeMFCCBuffer() throws InterruptedException
+	public AudioFeature takeMFCCBuffer() throws InterruptedException
 	{
 		return mfccBuffer.take();
 	}

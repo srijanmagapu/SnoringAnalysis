@@ -2,6 +2,7 @@ package audioProcessors;
 
 import java.util.ArrayList;
 
+import model.AudioFeature;
 import model.SignalBuffer;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
@@ -28,6 +29,9 @@ public class STFTEnergyProcssor implements AudioProcessor
 	private final int MAX_NUMBER_OF_SAMPLES = 3000;
 	private ArrayList<float[]> tdCumulativeBuffer;
 	private ArrayList<float[]> fdCumulativeBuffer;
+	
+	double eventStart;
+	double eventEnd;
 	
 	private final SignalBuffer signalEnergyBuffer;
 	public SignalBuffer getSignalEnergyBuffer()
@@ -152,8 +156,10 @@ public class STFTEnergyProcssor implements AudioProcessor
 		if (newOutOfControlState)
 		{
 			if(!previousOutOfControlState)
+			{
+				eventStart = audioEvent.getTimeStamp();
 				resetEnergyComputations();
-			
+			}
 			overlap = audioEvent.getOverlap();
 			// event floatBuffer is reused so copy it to another array
 			float[] eventFloatBuffer = audioEvent.getFloatBuffer();
@@ -180,6 +186,7 @@ public class STFTEnergyProcssor implements AudioProcessor
 		else if(previousOutOfControlState)
 		{
 			//compute final energy for the acoustical event detected by v-box
+			eventEnd = audioEvent.getTimeStamp();
 			finishEnergyComputation();
 		}
 		
@@ -233,9 +240,14 @@ public class STFTEnergyProcssor implements AudioProcessor
 		for (int i = 0; i < numOfBands; i++)
 			energy[i] /= overallEnergy;
 		
+		AudioFeature feature = new AudioFeature();
+		feature.setData(energy);
+		feature.setStartTime(eventStart);
+		feature.setEndTime(eventEnd);
+		
 		count++;
 		System.out.println("Adding Energy vector " + count);
-		FeatureQueue.getInstance().addEnergyBuffer(energy);
+		FeatureQueue.getInstance().addEnergyBuffer(feature);
 
 		//create signalTDBuffer
 		createTDBuffer();

@@ -2,6 +2,9 @@ package businessLayer;
 
 import java.util.ArrayList;
 
+import model.AudioEventDescriptor;
+import model.AudioFeature;
+
 public class FeatureWorker implements Runnable
 {
 	private static ArrayList<FeatureWorker> workerList = new ArrayList<>();
@@ -10,6 +13,9 @@ public class FeatureWorker implements Runnable
 	private IFeatureConsumer consumer;
 	
 	private boolean stopped;
+	
+	double eventStart;
+	double eventEnd;
 	
 	public FeatureWorker(FeatureQueue featureQueue)
 	{
@@ -31,15 +37,15 @@ public class FeatureWorker implements Runnable
 	public void stopWorker()
 	{
 		stopped = true;
-		queue.addEnergyBuffer(new float[0]);
-		queue.addMFCCBuffer(new float[0]);
+		queue.addEnergyBuffer(new AudioFeature());
+		queue.addMFCCBuffer(new AudioFeature());
 	}
 
 	@Override
 	public void run()
 	{
-		float[] energy;
-		float[] mfcc;
+		AudioFeature energy;
+		AudioFeature mfcc;
 		
 		while(!stopped)
 		{
@@ -47,10 +53,10 @@ public class FeatureWorker implements Runnable
 			{
 				energy = queue.takeEnergyBuffer();
 				mfcc = queue.takeMFCCBuffer();
-
-				if(energy.length==0 || mfcc.length==0)
+				
+				if(energy.getData()==null || mfcc.getData()==null)
 					break;
-					
+				
 				if(consumer != null)
 					consumer.consume(energy, mfcc);
 				

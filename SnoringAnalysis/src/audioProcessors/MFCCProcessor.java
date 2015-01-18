@@ -1,5 +1,6 @@
 package audioProcessors;
 
+import model.AudioFeature;
 import model.SignalBuffer;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
@@ -18,6 +19,8 @@ public class MFCCProcessor implements AudioProcessor
 	int amountOfCepstrumCoef;
 
 	float[] mfcc;
+	double eventStart;
+	double eventEnd;
 	float overallMfcc;
 	
 	public IVerticalBoxProcessor getIVerticalBoxProcessor()
@@ -58,7 +61,10 @@ public class MFCCProcessor implements AudioProcessor
 		if(newOutOfControlState)
 		{
 			if(!previousOutOfControlState)
+			{
+				eventStart = audioEvent.getTimeStamp();
 				resetMFCCComputations();
+			}
 			
 			mfccProcessor.process(audioEvent);
 			float[] localMfcc = mfccProcessor.getMFCC();
@@ -72,6 +78,7 @@ public class MFCCProcessor implements AudioProcessor
 		else if(previousOutOfControlState)
 		{
 			//compute final MFCC for the acoustical event detected by v-box
+			eventEnd = audioEvent.getTimeStamp();
 			finishMfccComputng();
 		}
 		
@@ -87,9 +94,14 @@ public class MFCCProcessor implements AudioProcessor
 		for(int i = 0; i < mfcc.length; i++)
 			mfcc[i] /= overallMfcc;
 
+		AudioFeature feature = new AudioFeature();
+		feature.setData(mfcc);
+		feature.setStartTime(eventStart);
+		feature.setEndTime(eventEnd);
+		
 		count++;
 		System.out.println("Adding MFCC vector " + count);
-		FeatureQueue.getInstance().addMFCCBuffer(mfcc);
+		FeatureQueue.getInstance().addMFCCBuffer(feature);
 		
 		signalBuffer.setBuffer(mfcc);
 	}

@@ -58,7 +58,6 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	private static final int amountOfMelFilters = 10;
 	
 	private AudioDispatcher mainDispatcher;
-	private Thread mainDispatcherThread;
 	private DummyProcessor dummyProcessor;
 	
 	private Mode processingMode = Mode.Training;
@@ -68,8 +67,8 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	
 	private IMainFrame mainFrame;
 	
-	private JVMAudioInputStream stream;
-	private JVMAudioInputStream preProcessorStream;
+	private String[] filesToProcess;
+	private SoundSource soundSource = SoundSource.File;
 	
 	public DispatchManager(IMainFrame frame)
 	{
@@ -78,23 +77,89 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		frame.getSourcePanel().registerPlaySoundSwither(this);
 	}
 	
-
+	
+	@Override
+	public void startProcessing(SoundSource source, String path)
+	{
+		startProcessing(source, new String[]{path});
+	}
+	
+	@Override
+	public void startProcessing(SoundSource source, String[] pathes)
+	{
+		this.filesToProcess = pathes.clone();
+		this.soundSource = source;
+		
+		Thread t = new Thread(this, "DispatchManager");
+		System.out.println(t.getName() + " : " + t.getId());
+		t.start();
+	}
+	
 	@Override
 	public void run()
 	{
-		try
+		switch(soundSource)
 		{
-			double vboxHeight = preProcessAudio();
-			processAudio( vboxHeight );
-		}
-		catch (UnsupportedAudioFileException e)
-		{
-			e.printStackTrace();
+		case File:
+			processFiles(filesToProcess);
+			break;
+			
+		case Mic:
+			processMic();
+			break;
 		}
 	}
 	
-	private double preProcessAudio()
+	private void processFiles(String[] pathes)
 	{
+		//set FeatureWorker
+		IFeatureConsumer iConsumer = null;
+		switch (processingMode)
+		{
+		case Training:
+			iConsumer = new DBCreator(Constants.numOfDimensions, Constants.numOfClusters);
+			break;
+		case Analyzing:
+			iConsumer = new FeatureProcessor(Constants.numOfDimensions, Constants.numOfClusters);
+			break;
+		}
+
+		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
+		worker.setIConsumer(iConsumer);
+		(new Thread(worker, "FeatureWorker")).start();
+		
+		//process files
+		for(String path : pathes)
+		{
+			try
+			{
+				double vboxHeight = preProcessAudio(path);
+				processAudio( vboxHeight, path );
+			}
+			catch (UnsupportedAudioFileException e)
+			{
+				System.err.println("Exception while processing " + path);
+				e.printStackTrace();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		//this will finish processing
+		FeatureWorker.stopAllWorkers();
+	}
+	
+	private void processMic()
+	{
+		
+	}
+
+	
+	private double preProcessAudio(String path) throws UnsupportedAudioFileException, IOException
+	{
+		JVMAudioInputStream preProcessorStream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
 		AudioDispatcher preProcessorDispatcher = new AudioDispatcher(preProcessorStream, audioBufferSize, 0);
 
 		BandPass bandPass = new BandPass(centerFreq, freqWidth, sampleRate);
@@ -104,12 +169,12 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		preProcessorDispatcher.addAudioProcessor(preProessor);
 		preProcessorDispatcher.run();
 		
-		preProcessorDispatcher.stop();
 		return preProessor.getCaculatedheight();
 	}
 	
-	public void processAudio( double vboxHeight ) throws UnsupportedAudioFileException
+	public void processAudio( double vboxHeight, String path ) throws UnsupportedAudioFileException, IOException
 	{
+		JVMAudioInputStream stream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
 		mainDispatcher = new AudioDispatcher(stream, audioBufferSize, bufferOverlap);
 
 		//============  Filter  ===========
@@ -147,10 +212,11 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		final SignalBuffer mfccBuffer = mfccProcessor.getSignalBuffer();
 		SignalGraphController mfccControler = new SignalGraphController(mfccView, mfccBuffer);
 		
-		//Dummy processor
+		//============  Dummy processor  ============
 		dummyProcessor = new DummyProcessor();
 		dummyProcessor.setInterruptProcessing(false);
 		
+		// Progress bar
 		final IProgressBar progressBarView = mainFrame.getIProgressBar();
 		final ProgressData progressData = dummyProcessor.getProgressData();
 		ProcessProgressController progressController = new ProcessProgressController(progressBarView, progressData);
@@ -163,6 +229,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		}
 		catch (LineUnavailableException e)
 		{
+			System.err.println("Can't create audio player for " + path);
 			e.printStackTrace();
 		}
 
@@ -177,65 +244,6 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		mainDispatcher.addAudioProcessor(dummyProcessor);
 		
 		mainDispatcher.run();
-		mainDispatcher.stop();
-		
-	}
-
-	@Override
-	public void startProcessing(SoundSource source, String path)
-	{
-		try
-		{
-			switch(source)
-			{
-			case File:
-				preProcessorStream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
-				stream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
-				
-				break;
-				
-			case Mic:
-				break;
-			}
-			
-			FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
-			
-			IFeatureConsumer iConsumer = null;
-			switch (processingMode)
-			{
-			case Training:
-				iConsumer = new DBCreator(Constants.numOfDimensions, Constants.numOfClusters);
-				break;
-			case Analyzing:
-				iConsumer = new FeatureProcessor(Constants.numOfDimensions, Constants.numOfClusters);
-				break;
-			}
-			
-			worker.setIConsumer(iConsumer);
-			(new Thread(worker, "FeatureWorker")).start();
-			
-			/*SwingUtilities.invokeLater(new SwingWorker(){
-
-				@Override
-				protected Object doInBackground() throws Exception
-				{
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-			});*/
-			Thread t = new Thread(this, "DispatchManager");
-			System.out.println(t.getName() + " : " + t.getId());
-			t.start();
-		}
-		catch(UnsupportedAudioFileException ex)
-		{
-			ex.printStackTrace();
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
 	}
 
 	@Override
@@ -260,4 +268,5 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		if(audioPlayer != null)
 			audioPlayer.setPlayAudio(enable);
 	}
+
 }

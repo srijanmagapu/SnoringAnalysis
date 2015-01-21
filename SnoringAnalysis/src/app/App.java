@@ -34,8 +34,6 @@ public class App {
 				}
 			}
 		});
-		
-		//app.dm.initDispatcher( new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(args[0])) ));
 	}
 
 }

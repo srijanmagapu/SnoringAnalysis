@@ -3,53 +3,36 @@ package gui;
 import gui.interfaces.IPlaySoundSwitcher;
 import gui.interfaces.ISourcePanel;
 
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JButton;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.LineBorder;
-
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
-
-import javax.swing.JTextField;
-
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.awt.event.ComponentEvent;
-
-import javax.swing.ButtonGroup;
-
-import java.awt.event.MouseListener;
-
-import javax.swing.event.AncestorListener;
-import javax.swing.event.AncestorEvent;
-
-import java.awt.event.ComponentListener;
 
 import javax.swing.Box;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.AncestorEvent;
 
 import controllers.IStartProcessingHandler;
 
-import java.awt.Component;
-
-import javax.swing.BoxLayout;
-
-import java.awt.BorderLayout;
-
-import javax.swing.JCheckBox;
-
-import java.awt.Dimension;
-
 public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionListener, MouseListener
 {
+	private static final long serialVersionUID = -8976814604884193624L;
 	private SoundSource DEFAULT_SOUNDSOURCE = SoundSource.File;
 	private String DEFAULT_FOLDER = "sounds";
 

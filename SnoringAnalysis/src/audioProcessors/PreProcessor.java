@@ -1,11 +1,7 @@
 package audioProcessors;
 
-import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansClusterer;
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
 import org.battelle.clodhopper.tuple.ArrayTupleList;

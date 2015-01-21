@@ -1,21 +1,9 @@
 package gui;
 
 import javax.swing.JPanel;
-
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
-
-import javax.swing.border.TitledBorder;
-import javax.swing.border.LineBorder;
-
-import org.jfree.chart.ChartPanel;
-
-import java.awt.Color;
-
 import gui.graphs.LineGraph;
-
 import org.jfree.chart.JFreeChart;
-
 import gui.graphs.AreaGraph;
 import gui.interfaces.IGraphsPanel;
 

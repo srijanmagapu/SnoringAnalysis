@@ -12,11 +12,6 @@ import businessLayer.FeatureQueue;
 
 public class STFTEnergyProcssor implements AudioProcessor
 {
-	/**
-	 * The width of single frequency band
-	 */
-	//private final int freqBand = 500;
-	private final int freqBand;
 	
 	/**
 	 * Number of bands in the buffer
@@ -124,10 +119,9 @@ public class STFTEnergyProcssor implements AudioProcessor
 		this.vboxProcessor = vboxProcessor;
 	}
 
-	public STFTEnergyProcssor(int bufferSize, int freqBand, int numOfBands)
+	public STFTEnergyProcssor(int bufferSize, int numOfBands)
 	{
 		this.bufferSize = bufferSize;
-		this.freqBand = freqBand;
 		this.numOfBands = numOfBands;
 		
 		this.fft = new FFT(bufferSize, new HammingWindow());

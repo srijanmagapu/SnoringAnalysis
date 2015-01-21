@@ -2,7 +2,6 @@ package businessLayer;
 
 import java.util.ArrayList;
 
-import model.AudioEventDescriptor;
 import model.AudioFeature;
 
 public class FeatureWorker implements Runnable

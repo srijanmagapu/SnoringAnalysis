@@ -119,7 +119,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		VerticalBoxProcessor vboxProcessor = new VerticalBoxProcessor((float) vboxHeight);
 		
 		//============  Energy  ============
-		STFTEnergyProcssor energyProcessor = new STFTEnergyProcssor(audioBufferSize, energyFreqBand, numOfEnergyBands);
+		STFTEnergyProcssor energyProcessor = new STFTEnergyProcssor(audioBufferSize, numOfEnergyBands);
 		energyProcessor.setIVerticalBoxProcessor(vboxProcessor);
 		
 		// TD graph

@@ -5,39 +5,23 @@ import gui.interfaces.IMainFrame;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISourcePanel;
 import gui.settingsWindow.SettingsWindow;
-
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
-import javax.swing.JProgressBar;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-
 import java.awt.CardLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
-import javax.swing.ButtonGroup;
-
-import org.eclipse.swt.widgets.ProgressBar;
-
-import app.DispatchManager;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-
-import javax.swing.KeyStroke;
-
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.ButtonGroup;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
 
 public class MainFrame extends JFrame implements ActionListener, IMainFrame, IProgressBar
 {

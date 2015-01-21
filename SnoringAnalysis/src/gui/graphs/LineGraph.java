@@ -2,21 +2,18 @@ package gui.graphs;
 
 import gui.interfaces.ISignalGraph;
 
+import java.awt.Color;
+import java.text.SimpleDateFormat;
+
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
-import javax.swing.border.TitledBorder;
-import javax.swing.border.LineBorder;
-
-import java.awt.Color;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public class LineGraph extends ChartPanel implements ISignalGraph
 {

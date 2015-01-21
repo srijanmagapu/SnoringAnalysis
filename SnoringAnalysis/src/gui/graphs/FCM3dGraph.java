@@ -1,6 +1,9 @@
 package gui.graphs;
 
-import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -8,19 +11,14 @@ import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.Settings;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.chart.factories.IChartComponentFactory.Toolkit;
-import org.jzy3d.chart.factories.SwingChartComponentFactory;
 import org.jzy3d.colors.Color;
 import org.jzy3d.maths.Coord3d;
-import org.jzy3d.plot3d.builder.Mapper;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-
 public class FCM3dGraph extends JPanel
 {
+	private static final long serialVersionUID = 2717233264552263693L;
 	private Coord3d[] points;
 	private Color[] colors;
 	private Scatter scatter;

@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 
 public class SettingsPanel extends JPanel implements MouseListener
 {
+	private static final long serialVersionUID = -3585563240704105519L;
 	private JPanel panel;
 	private JLabel lblDataBaseFile;
 	private JTextField dbPath;

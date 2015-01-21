@@ -3,7 +3,6 @@ package gui.dbCreatorWindow;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.*;
 
 import javax.swing.*;
@@ -11,7 +10,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -19,6 +17,7 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class FileTreePanel extends JPanel
 {
+	private static final long serialVersionUID = -5940862464797272020L;
 	/**
 	 * File system view.
 	 */
@@ -31,6 +30,8 @@ public class FileTreePanel extends JPanel
 	 */
 	private static class FileTreeCellRenderer extends DefaultTreeCellRenderer
 	{
+		private static final long serialVersionUID = 1755384840831932181L;
+
 		/**
 		 * Icon cache to speed the rendering.
 		 */

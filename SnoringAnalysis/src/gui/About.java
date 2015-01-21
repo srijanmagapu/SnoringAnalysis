@@ -9,10 +9,10 @@ import javax.swing.SwingConstants;
 import java.awt.Color;
 import javax.swing.ImageIcon;
 import java.awt.Toolkit;
-import java.awt.Dialog.ModalityType;
 
 public class About extends JDialog
 {
+	private static final long serialVersionUID = 5279574412673615034L;
 	private JLabel lblSnoringAnalyzer;
 	private JLabel lblVersion;
 	private JLabel lblDevelopedBy;

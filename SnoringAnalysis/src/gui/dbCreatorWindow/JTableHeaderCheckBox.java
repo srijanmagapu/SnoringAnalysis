@@ -62,6 +62,7 @@ public class JTableHeaderCheckBox
 
 class CheckBoxHeader extends JCheckBox implements TableCellRenderer, MouseListener
 {
+	private static final long serialVersionUID = 3752253573865899762L;
 	protected CheckBoxHeader rendererComponent;
 	protected int column;
 	protected boolean mousePressed = false;

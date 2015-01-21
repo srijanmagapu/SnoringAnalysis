@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 
 public class SettingsWindow extends JDialog
 {
-
+	private static final long serialVersionUID = -8120511484901187729L;
 	private final JPanel contentPanel = new JPanel();
 	private JButton saveButton;
 	private JButton cancelButton;

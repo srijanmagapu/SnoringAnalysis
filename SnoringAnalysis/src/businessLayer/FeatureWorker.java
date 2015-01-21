@@ -11,8 +11,6 @@ public class FeatureWorker implements Runnable
 	private FeatureQueue queue;
 	private IFeatureConsumer consumer;
 	
-	private boolean stopped;
-	
 	double eventStart;
 	double eventEnd;
 	
@@ -35,7 +33,6 @@ public class FeatureWorker implements Runnable
 	
 	public void stopWorker()
 	{
-		stopped = true;
 		queue.addEnergyBuffer(new AudioFeature());
 		queue.addMFCCBuffer(new AudioFeature());
 	}
@@ -46,7 +43,7 @@ public class FeatureWorker implements Runnable
 		AudioFeature energy;
 		AudioFeature mfcc;
 		
-		while(!stopped)
+		while(true)
 		{
 			try
 			{

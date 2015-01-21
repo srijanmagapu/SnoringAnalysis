@@ -8,11 +8,6 @@ import java.io.IOException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.UIManager;
 
-import utils.Constants;
-import businessLayer.DBCreator;
-import businessLayer.FeatureQueue;
-import businessLayer.FeatureWorker;
-
 public class App {
 	
 	public static void main(String[] args) throws UnsupportedAudioFileException, IOException

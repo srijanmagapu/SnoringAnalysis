@@ -15,6 +15,7 @@ public class SettingsWindow extends JDialog
 	private final JPanel contentPanel = new JPanel();
 	private JButton saveButton;
 	private JButton cancelButton;
+	private SettingsPanel settingsPanel;
 
 	/**
 	 * Launch the application.
@@ -33,7 +34,6 @@ public class SettingsWindow extends JDialog
 		{
 			SettingsWindow dialog = new SettingsWindow();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			//dialog.pack();
 			dialog.setVisible(true);
 		}
 		catch (Exception e)
@@ -47,13 +47,15 @@ public class SettingsWindow extends JDialog
 	 */
 	public SettingsWindow()
 	{
+		setName("Settings");
+		setModal(true);
 		setBounds(100, 100, 639, 408);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		
-		SettingsPanel settingsPanel = new SettingsPanel();
+		settingsPanel = new SettingsPanel();
 		contentPanel.add(settingsPanel, BorderLayout.CENTER);
 
 		JPanel buttonPane = new JPanel();

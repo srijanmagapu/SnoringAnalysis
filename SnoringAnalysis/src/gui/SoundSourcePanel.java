@@ -1,5 +1,6 @@
 package gui;
 
+import gui.conrollers.ProcessHandlerController;
 import gui.interfaces.IPlaySoundSwitcher;
 import gui.interfaces.ISourcePanel;
 
@@ -45,7 +46,6 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 	private JButton btnBrowse;
 	private JButton btnStartStop;
 
-	ArrayList<IStartProcessingHandler> startHandlers;
 	ArrayList<IPlaySoundSwitcher> playSoundSwitcher;
 	private JPanel leftPanel;
 	private JPanel rightPanel;
@@ -109,13 +109,7 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 		centerPanel.add(verticalStrut_1, BorderLayout.SOUTH);
 	}
 
-	@Override
-	public void registerStartStopHandler(IStartProcessingHandler startHandler)
-	{
-		if (startHandlers == null) startHandlers = new ArrayList<>();
 
-		startHandlers.add(startHandler);
-	}
 	
 
 	@Override
@@ -194,25 +188,24 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 		// start/stop
 		if (button == btnStartStop)
 		{
+			IStartProcessingHandler handler = ProcessHandlerController.getStartStopProcessingHandler();
 			String btnText = button.getText();
 			switch (btnText)
 			{
 			case "Start":
-				if (startHandlers != null)
+				if (handler != null)
 				{
 					button.setText("Stop");
-					for (IStartProcessingHandler handler : startHandlers)
-						handler.startProcessing(getSoundSource(), getChosenFileName());
+					handler.startProcessing(getSoundSource(), getChosenFileName());
 
 				}
 				break;
 
 			case "Stop":
-				if (startHandlers != null)
+				if (handler != null)
 				{
 					button.setText("Start");
-					for (IStartProcessingHandler handler : startHandlers)
-						handler.stopProcessing();
+					handler.stopProcessing();
 				}
 				break;
 			}
@@ -222,7 +215,6 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 		{
 			final JFileChooser fc = new JFileChooser();
 			fc.setCurrentDirectory(new File(Paths.get("").toAbsolutePath().toFile(), DEFAULT_FOLDER));
-			// new java.awt.FileDialog((java.awt.Frame)null).setVisible(true);
 			int returnVal = fc.showOpenDialog(event.getComponent());
 
 			if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -268,5 +260,4 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 	public void mouseReleased(MouseEvent arg0)
 	{
 	}
-
 }

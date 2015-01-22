@@ -1,11 +1,20 @@
 package gui.dbCreatorWindow;
 
+import gui.conrollers.ProcessHandlerController;
+import gui.conrollers.ProgressBarController;
+import gui.interfaces.IProgressBar;
+import gui.interfaces.ISourcePanel.SoundSource;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -21,15 +30,21 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-public class DBCreatorWindow extends JDialog implements TreeSelectionListener, MouseListener
+import controllers.IStartProcessingHandler;
+
+public class DBCreatorWindow extends JDialog implements TreeSelectionListener, ActionListener
 {
 	private static final long serialVersionUID = -6116927081135838672L;
 	private final JPanel contentPanel = new JPanel();
 	private JSplitPane splitPane;
 	private JTable table;
 	private FileTreePanel fileTreePanel;
-	private JScrollPane fileSelectionScrollPanel;
+	private JScrollPane fileSelectionPanel;
 	private DefaultTableModel fileSelectionTableModel;
+	private JButton btnStart;
+	private JButton btnClose;
+	private JProgressBar progressBar;
+	private Map<String, String> fileMap;
 
 	/**
 	 * Launch the application.
@@ -61,6 +76,9 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, M
 	 */
 	public DBCreatorWindow()
 	{
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setTitle("Create Data Base");
+		this.setModal(true);
 		setBounds(100, 100, 611, 393);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -71,23 +89,25 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, M
 		splitPane.setDividerLocation(200);
 		contentPanel.add(splitPane, BorderLayout.CENTER);
 
-		fileSelectionScrollPanel = new JScrollPane();
-		splitPane.setRightComponent(fileSelectionScrollPanel);
+		fileSelectionPanel = new JScrollPane();
+		splitPane.setRightComponent(fileSelectionPanel);
 
 		table = new JTable();
-		fileSelectionTableModel = new DefaultTableModel(new Object[][] {}, new String[] { "", "File" }) {
+		fileSelectionTableModel = new DefaultTableModel(new Object[][] {}, new String[] { "", "File" })
+		{
 			private static final long serialVersionUID = 1329796869192942072L;
 
 			@Override
-		    public Class<?> getColumnClass(int columnIndex) {
-		        return columnIndex == 0 ? Boolean.class : super.getColumnClass(columnIndex);
-		    }
+			public Class<?> getColumnClass(int columnIndex)
+			{
+				return columnIndex == 0 ? Boolean.class : super.getColumnClass(columnIndex);
+			}
 		};
-		//fileSelectionTableModel = new DefaultTableModel(new Object[][] {}, new String[] { "", "File" });
+
 		table.setModel(fileSelectionTableModel);
 		table.getColumnModel().getColumn(0).setMaxWidth(30);
-		fileSelectionScrollPanel.setViewportView(table);
-		
+		fileSelectionPanel.setViewportView(table);
+
 		fileTreePanel = new FileTreePanel();
 		fileTreePanel.setSelectionListenr(this);
 		splitPane.setLeftComponent(fileTreePanel);
@@ -96,19 +116,21 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, M
 		getContentPane().add(controlPane, BorderLayout.SOUTH);
 		controlPane.setLayout(new BorderLayout(0, 0));
 
-		JProgressBar progressBar = new JProgressBar();
+		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
+		ProgressBarController.getInstance().setProgressBar(progressBar);
 		controlPane.add(progressBar, BorderLayout.SOUTH);
 
 		JPanel buttonPanel = new JPanel();
 		controlPane.add(buttonPanel, BorderLayout.EAST);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JButton btnStart = new JButton("Start");
+		btnStart = new JButton("Start");
+		btnStart.addActionListener(this);
 		buttonPanel.add(btnStart);
 
-		JButton btnClose = new JButton("Close");
-		btnClose.addMouseListener(this);
+		btnClose = new JButton("Close");
+		btnClose.addActionListener(this);
 		buttonPanel.add(btnClose);
 
 	}
@@ -116,8 +138,8 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, M
 	@Override
 	public void valueChanged(TreeSelectionEvent e)
 	{
-		JTree tree = (JTree)e.getSource();
-		FileTreeNode ftn = (FileTreeNode)(tree.getLastSelectedPathComponent());
+		JTree tree = (JTree) e.getSource();
+		FileTreeNode ftn = (FileTreeNode) (tree.getLastSelectedPathComponent());
 		File[] wavFiles = ftn.getFile().listFiles(new FilenameFilter()
 		{
 			@Override
@@ -128,21 +150,77 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, M
 		});
 
 		fileSelectionTableModel.setRowCount(0);
-		
-		for(File f : wavFiles)
-			fileSelectionTableModel.addRow(new Object[]{false, f.getName()});
+		fileMap = new Hashtable<>();
+		for (File f : wavFiles)
+		{
+			fileSelectionTableModel.addRow(new Object[] { false, f.getName() });
+			fileMap.put(f.getName(), f.toString());
+		}
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		JButton source = null;
+		if (e.getSource() instanceof JButton)
+		{
+			source = (JButton) e.getSource();
+
+			if (source == btnStart)
+			{
+				switch(source.getText())
+				{
+				case "Start":
+					source.setText("Stop");
+					sendFilesToProcessing();
+					break;
+					
+				case "Stop":
+					source.setText("Start");
+					stopProcessing();
+					break;
+				}
+				
+			}
+			else if (source == btnClose)
+			{
+				this.dispose();
+			}
+		}
+	}
+
+	private void sendFilesToProcessing()
+	{
+		IStartProcessingHandler handler = ProcessHandlerController.getStartStopProcessingHandler();
+		if (handler != null)
+		{
+			ArrayList<String> selectedFiles = new ArrayList<>();
+			@SuppressWarnings("unchecked")
+			Vector<Vector<Object>> data = fileSelectionTableModel.getDataVector();
+			for (Vector<Object> row : data)
+			{
+				if ((boolean) row.elementAt(0) == true)
+					selectedFiles.add(fileMap.get((String) row.elementAt(1)));
+			}
+
+			String[] pathes = new String[selectedFiles.size()];
+			pathes = selectedFiles.toArray(new String[0]);
+			
+			handler.startProcessing(SoundSource.File, pathes);
+		}
 	}
 	
-	public void mouseClicked(MouseEvent arg0)
+	private void stopProcessing()
 	{
-		this.dispose();
+		IStartProcessingHandler handler = ProcessHandlerController.getStartStopProcessingHandler();
+		if (handler != null)
+			handler.stopProcessing();
 	}
-	public void mouseEntered(MouseEvent arg0) {
+
+	@Override
+	public void dispose()
+	{
+		ProgressBarController.getInstance().removeProgressBar();
+		super.dispose();
 	}
-	public void mouseExited(MouseEvent arg0) {
-	}
-	public void mousePressed(MouseEvent arg0) {
-	}
-	public void mouseReleased(MouseEvent arg0) {
-	}
+
 }

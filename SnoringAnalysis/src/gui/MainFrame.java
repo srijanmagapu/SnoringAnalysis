@@ -1,10 +1,13 @@
 package gui;
 
+import gui.conrollers.ProcessHandlerController;
+import gui.conrollers.ProgressBarController;
 import gui.interfaces.IGraphsPanel;
 import gui.interfaces.IMainFrame;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISourcePanel;
 import gui.settingsWindow.SettingsWindow;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Toolkit;
@@ -12,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -23,7 +27,9 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
-public class MainFrame extends JFrame implements ActionListener, IMainFrame, IProgressBar
+import controllers.IStartProcessingHandler;
+
+public class MainFrame extends JFrame implements ActionListener, IMainFrame
 {
 
 	private static final long serialVersionUID = -3268929758235757177L;
@@ -119,6 +125,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame, IPr
 
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
+		ProgressBarController.getInstance().setProgressBar(progressBar);
 		contentPane.add(progressBar, BorderLayout.SOUTH);
 		
 		mainPanel = new JPanel();
@@ -171,12 +178,19 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame, IPr
 	@Override
 	public IProgressBar getIProgressBar()
 	{
-		return this;
+		return ProgressBarController.getInstance();
+	}
+
+	@Override
+	public void setStartStopProcessingHandler(IStartProcessingHandler handler)
+	{
+		ProcessHandlerController.setStartStopProcessingHandler(handler);
 	}
 	
 	@Override
-	public void setProgressValue(int percent)
+	public void dispose()
 	{
-		progressBar.setValue(percent);
+		ProgressBarController.getInstance().removeProgressBar();
+		super.dispose();
 	}
 }

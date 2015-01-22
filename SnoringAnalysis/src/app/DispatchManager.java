@@ -73,7 +73,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	public DispatchManager(IMainFrame frame)
 	{
 		this.mainFrame = frame;
-		frame.getSourcePanel().registerStartStopHandler(this);
+		frame.setStartStopProcessingHandler(this);
 		frame.getSourcePanel().registerPlaySoundSwither(this);
 	}
 	
@@ -187,30 +187,9 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		STFTEnergyProcssor energyProcessor = new STFTEnergyProcssor(audioBufferSize, numOfEnergyBands);
 		energyProcessor.setIVerticalBoxProcessor(vboxProcessor);
 		
-		// TD graph
-		final ISignalGraph tdView = mainFrame.getIGraphsPanel().getTDGraphPanel();
-		final SignalBuffer tdBuffer = energyProcessor.getSignalTDBuffer();
-		SignalGraphController tdControler = new SignalGraphController(tdView, tdBuffer);
-		
-		// FD graph
-		final AreaGraph fdView = mainFrame.getIGraphsPanel().getFDGraphPanel();
-		final SignalBuffer fdBuffer = energyProcessor.getSignalFFTBuffer();
-		FDGraphController fdControler = new FDGraphController(fdView, fdBuffer);
-		fdControler.setFFT(energyProcessor.getFFT());
-		
-		// Energy graph
-		final AreaGraph energyView = mainFrame.getIGraphsPanel().getEnergyGraphPanel();
-		final SignalBuffer energyBuffer = energyProcessor.getSignalEnergyBuffer();
-		EnergyGraphController energyControler = new EnergyGraphController(energyView, energyBuffer);
-		
 		//============  MFCC  ============
 		MFCCProcessor mfccProcessor = new MFCCProcessor(audioBufferSize, sampleRate, amountOfCepstrumCoef, amountOfMelFilters, minFreq, maxFreq);
 		mfccProcessor.setIVerticalBoxProcessor(vboxProcessor);
-		
-		//MFCC graph
-		final ISignalGraph mfccView = mainFrame.getIGraphsPanel().getMFCCGraphPanel();
-		final SignalBuffer mfccBuffer = mfccProcessor.getSignalBuffer();
-		SignalGraphController mfccControler = new SignalGraphController(mfccView, mfccBuffer);
 		
 		//============  Dummy processor  ============
 		dummyProcessor = new DummyProcessor();
@@ -219,7 +198,36 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		// Progress bar
 		final IProgressBar progressBarView = mainFrame.getIProgressBar();
 		final ProgressData progressData = dummyProcessor.getProgressData();
-		ProcessProgressController progressController = new ProcessProgressController(progressBarView, progressData);
+		//ProcessProgressController progressController = new ProcessProgressController(progressBarView, progressData);
+		new ProcessProgressController(progressBarView, progressData);
+		
+		if (processingMode == Mode.Analyzing)
+		{
+			// TD graph
+			final ISignalGraph tdView = mainFrame.getIGraphsPanel().getTDGraphPanel();
+			final SignalBuffer tdBuffer = energyProcessor.getSignalTDBuffer();
+			//SignalGraphController tdControler = new SignalGraphController(tdView, tdBuffer);
+			new SignalGraphController(tdView, tdBuffer);
+
+			// FD graph
+			final AreaGraph fdView = mainFrame.getIGraphsPanel().getFDGraphPanel();
+			final SignalBuffer fdBuffer = energyProcessor.getSignalFFTBuffer();
+			FDGraphController fdControler = new FDGraphController(fdView, fdBuffer);
+			fdControler.setFFT(energyProcessor.getFFT());
+
+			// Energy graph
+			final AreaGraph energyView = mainFrame.getIGraphsPanel().getEnergyGraphPanel();
+			final SignalBuffer energyBuffer = energyProcessor.getSignalEnergyBuffer();
+			//EnergyGraphController energyControler = new EnergyGraphController(energyView, energyBuffer);
+			new EnergyGraphController(energyView, energyBuffer);
+			
+			//MFCC graph
+			final ISignalGraph mfccView = mainFrame.getIGraphsPanel().getMFCCGraphPanel();
+			final SignalBuffer mfccBuffer = mfccProcessor.getSignalBuffer();
+			//SignalGraphController mfccControler = new SignalGraphController(mfccView, mfccBuffer);
+			new SignalGraphController(mfccView, mfccBuffer);
+			
+		}
 		
 		//Audio Player
 		try
@@ -246,6 +254,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		mainDispatcher.run();
 	}
 
+	
 	@Override
 	public void stopProcessing()
 	{

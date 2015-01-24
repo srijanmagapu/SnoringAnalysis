@@ -16,6 +16,7 @@ import model.EventPoint;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
 
 public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 {
@@ -25,6 +26,11 @@ public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 	private FCM3DScatterPanel m3DScatterPanel;
 	private JButton randomButton;
 	private JButton cancelButton;
+	private JButton btnleft;
+	private JButton btnRigth;
+	private JButton btnUp;
+	private JButton btnDown;
+	private JButton btnReset;
 
 	/**
 	 * Launch the application.
@@ -65,6 +71,30 @@ public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 
 		randomButton = new JButton("Random");
 		randomButton.addActionListener(this);
+		
+		btnleft = new JButton("");
+		btnleft.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/left.png")));
+		btnleft.addActionListener(this);
+		
+		btnDown = new JButton("");
+		btnDown.addActionListener(this);
+		btnDown.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/down.png")));
+		buttonPane.add(btnDown);
+		
+		btnUp = new JButton("");
+		btnUp.addActionListener(this);
+		btnUp.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/up.png")));
+		buttonPane.add(btnUp);
+		buttonPane.add(btnleft);
+		
+		btnRigth = new JButton("");
+		btnRigth.addActionListener(this);
+		btnRigth.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/right.png")));
+		buttonPane.add(btnRigth);
+		
+		btnReset = new JButton("Reset");
+		btnReset.addActionListener(this);
+		buttonPane.add(btnReset);
 		randomButton.setActionCommand("random");
 		buttonPane.add(randomButton);
 		getRootPane().setDefaultButton(randomButton);
@@ -84,6 +114,36 @@ public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 		if(source == randomButton)
 		{
 			m3DScatterPanel.randomChart();
+			this.revalidate();
+			this.repaint();
+		}
+		else if (source == btnleft)
+		{
+			m3DScatterPanel.rotateLeft();
+			this.revalidate();
+			this.repaint();
+		}
+		else if (source == btnRigth)
+		{
+			m3DScatterPanel.rotateRigth();
+			this.revalidate();
+			this.repaint();
+		}
+		else if (source == btnUp)
+		{
+			m3DScatterPanel.rotateUp();
+			this.revalidate();
+			this.repaint();
+		}
+		else if (source == btnDown)
+		{
+			m3DScatterPanel.rotateDown();
+			this.revalidate();
+			this.repaint();
+		}
+		else if (source == btnReset)
+		{
+			m3DScatterPanel.resetRotation();
 			this.revalidate();
 			this.repaint();
 		}

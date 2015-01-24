@@ -37,6 +37,7 @@ import businessLayer.FeatureQueue;
 import businessLayer.FeatureWorker;
 import businessLayer.IFeatureConsumer;
 import businessLayer.IModeSwitcher;
+import businessLayer.IModeSwitcher.Mode;
 
 public class DispatchManager implements IStartProcessingHandler, Runnable, IModeSwitcher, IPlaySoundSwitcher
 {
@@ -79,14 +80,15 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	
 	
 	@Override
-	public void startProcessing(SoundSource source, String path)
+	public void startProcessing(SoundSource source, String path, Mode mode)
 	{
-		startProcessing(source, new String[]{path});
+		startProcessing(source, new String[]{path}, mode);
 	}
 	
 	@Override
-	public void startProcessing(SoundSource source, String[] pathes)
+	public void startProcessing(SoundSource source, String[] pathes, Mode mode)
 	{
+		switchMode(mode);
 		this.filesToProcess = pathes.clone();
 		this.soundSource = source;
 		

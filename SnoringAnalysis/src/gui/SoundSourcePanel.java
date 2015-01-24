@@ -29,6 +29,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.AncestorEvent;
 
+import businessLayer.IModeSwitcher.Mode;
 import controllers.IStartProcessingHandler;
 
 public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionListener, MouseListener
@@ -196,7 +197,7 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 				if (handler != null)
 				{
 					button.setText("Stop");
-					handler.startProcessing(getSoundSource(), getChosenFileName());
+					handler.startProcessing(getSoundSource(), getChosenFileName(), Mode.Analyzing);
 
 				}
 				break;

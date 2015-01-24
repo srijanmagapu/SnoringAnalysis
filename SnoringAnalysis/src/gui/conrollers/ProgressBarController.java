@@ -1,12 +1,11 @@
 package gui.conrollers;
 
+import gui.interfaces.IProgressBar;
+
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.swing.JProgressBar;
-
-import gui.interfaces.IProgressBar;
 
 public class ProgressBarController implements IProgressBar
 {

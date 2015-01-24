@@ -87,7 +87,7 @@ public class FCMGraphData
 	
 	private int getClosestCluster(double[] point)
 	{
-		double minDist = 0;
+		double minDist = Double.MAX_VALUE;
 		int closestCluster = 0;
 		
 		for(int i = 0; i < centers.size(); i++ )

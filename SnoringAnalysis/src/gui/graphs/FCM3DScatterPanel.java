@@ -1,19 +1,17 @@
 package gui.graphs;
 
-import java.awt.BorderLayout;
-import java.sql.Date;
-import java.util.Random;
-
 import gui.interfaces.IFCMDialog;
+
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
 import model.EventPoint;
 import ChartDirector.Chart;
 import ChartDirector.ChartViewer;
-import ChartDirector.RanSeries;
 import ChartDirector.ThreeDScatterChart;
-import ChartDirector.ThreeDScatterGroup;
 
 public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 {
@@ -45,10 +43,17 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	private static final int breathingPointSize = 9;
 	private static final int snoringPointSize = 9;
 	private static final int noisePointSize = 9;
+
+	private static final int defaultX = 0;
+	private static final int defaultY = 30;
+	private static final int defaultZ = 15;
+
+	private int xAngle = defaultX;
+	private int yAngle = defaultY;
+	private int zAngle = defaultZ;
 	
-	
-	ChartViewer viewer;
-	ThreeDScatterChart chart;
+	private ChartViewer viewer;
+	private ThreeDScatterChart chart;
 	
 	private EventPoint[] centers;
 	private EventPoint[][] groups;
@@ -88,7 +93,7 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
         newChart.setPlotRegion(350, 240, 360, 360, 270);
 
         // Set the elevation and rotation angles to 15 and 30 degrees
-        newChart.setViewAngle(15, 30);
+        newChart.setViewAngle(zAngle, yAngle, xAngle);
         
         // Add Legend
         newChart.addLegend(640, 180);
@@ -100,6 +105,8 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	{
 		// create new chart view
 		ChartViewer newViewer = new ChartViewer();
+		newViewer.setScrollCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		//newViewer.
 
 		// Output the chart
 		newViewer.setChart(chart);
@@ -159,57 +166,63 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	
 	private void addCenterToChart(ThreeDScatterChart chart, EventPoint center)
 	{
-		double[] xData = new double[1];
-		double[] yData = new double[1];
-		double[] zData = new double[1];
-		
-		double[] pointCoord = center.getCoordinates();
-		xData[0] = pointCoord[0];
-		yData[0] = pointCoord[1];
-		zData[0] = pointCoord[2];
-		
-		switch(center.getCluster())
+		if(center != null)
 		{
-		case 0:
-			chart.addScatterGroup(xData, yData, zData, "Center1", breathingCenterShape, breathingCenterSize, breathingCenterColor);
-			break;
-		case 1:
-			chart.addScatterGroup(xData, yData, zData, "Center2", snoringCenterShape, snoringCenterSize, snoringCenterColor);
-			break;
-		case 2:
-			chart.addScatterGroup(xData, yData, zData, "Center3", noiseCenterShape, noiseCenterSize, noiseCenterColor);
-			break;
+			double[] xData = new double[1];
+			double[] yData = new double[1];
+			double[] zData = new double[1];
+			
+			double[] pointCoord = center.getCoordinates();
+			xData[0] = pointCoord[0];
+			yData[0] = pointCoord[1];
+			zData[0] = pointCoord[2];
+			
+			switch(center.getCluster())
+			{
+			case 0:
+				chart.addScatterGroup(xData, yData, zData, "Center1", breathingCenterShape, breathingCenterSize, breathingCenterColor);
+				break;
+			case 1:
+				chart.addScatterGroup(xData, yData, zData, "Center2", snoringCenterShape, snoringCenterSize, snoringCenterColor);
+				break;
+			case 2:
+				chart.addScatterGroup(xData, yData, zData, "Center3", noiseCenterShape, noiseCenterSize, noiseCenterColor);
+				break;
+			}
 		}
 	}
 	
 	
 	private void addGroupToChart(ThreeDScatterChart chart, EventPoint[] group)
 	{
-		double[] xData = new double[group.length];
-		double[] yData = new double[group.length];
-		double[] zData = new double[group.length];
-		
-		for(int i = 0; i < group.length; i++)
+		if(group != null && group.length != 0)
 		{
-			double[] pointCoord = group[i].getCoordinates();
-			xData[i] = pointCoord[0];
-			yData[i] = pointCoord[1];
-			zData[i] = pointCoord[2];
-		}
-		
-		if(group != null && group.length > 0)
-		{
-			switch(group[0].getCluster())
+			double[] xData = new double[group.length];
+			double[] yData = new double[group.length];
+			double[] zData = new double[group.length];
+			
+			for(int i = 0; i < group.length; i++)
 			{
-			case 0:
-				chart.addScatterGroup(xData, yData, zData, "Cat1", breathingPointShape, breathingPointSize, breathingPointColor);
-				break;
-			case 1:
-				chart.addScatterGroup(xData, yData, zData, "Cat2", snoringPointShape, snoringPointSize, snoringPointColor);
-				break;
-			case 2:
-				chart.addScatterGroup(xData, yData, zData, "Cat3", noisePointShape, noisePointSize, noisePointColor);
-				break;
+				double[] pointCoord = group[i].getCoordinates();
+				xData[i] = pointCoord[0];
+				yData[i] = pointCoord[1];
+				zData[i] = pointCoord[2];
+			}
+			
+			if(group != null && group.length > 0)
+			{
+				switch(group[0].getCluster())
+				{
+				case 0:
+					chart.addScatterGroup(xData, yData, zData, "Cat1", breathingPointShape, breathingPointSize, breathingPointColor);
+					break;
+				case 1:
+					chart.addScatterGroup(xData, yData, zData, "Cat2", snoringPointShape, snoringPointSize, snoringPointColor);
+					break;
+				case 2:
+					chart.addScatterGroup(xData, yData, zData, "Cat3", noisePointShape, noisePointSize, noisePointColor);
+					break;
+				}
 			}
 		}
 	}
@@ -253,34 +266,36 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 		return new EventPoint(coord, cluster);
 	}
 	
-	private void addRandomPointsToChart(ThreeDScatterChart chart)
+
+	public void rotateLeft()
 	{
-		// The random XYZ data for the first 3D scatter group
-        RanSeries r0 = new RanSeries(7);
-        double[] xData0 = r0.getSeries2(100, 100, -10, 10);
-        double[] yData0 = r0.getSeries2(100, 0, 0, 20);
-        double[] zData0 = r0.getSeries2(100, 100, -10, 10);
-
-        // The random XYZ data for the second 3D scatter group
-        RanSeries r1 = new RanSeries(4);
-        double[] xData1 = r1.getSeries2(100, 100, -10, 10);
-        double[] yData1 = r1.getSeries2(100, 0, 0, 20);
-        double[] zData1 = r1.getSeries2(100, 100, -10, 10);
-
-        // The random XYZ data for the third 3D scatter group
-        RanSeries r2 = new RanSeries(8);
-        double[] xData2 = r2.getSeries2(100, 100, -10, 10);
-        double[] yData2 = r2.getSeries2(100, 0, 0, 20);
-        double[] zData2 = r2.getSeries2(100, 100, -10, 10);
-
-
-        // Add 3 scatter groups to the chart with 9 pixels glass sphere symbols of
-        // red (ff0000), green (00ff00) and blue (0000ff) colors
-        chart.addScatterGroup(xData0, yData0, zData0, "Alpha", Chart.GlassSphereShape, 9, 0x3ae705);
-        chart.addScatterGroup(xData1, yData1, zData1, "Beta", Chart.StarShape(4), 9, 0x0564e7);
-        chart.addScatterGroup(xData2, yData2, zData2, "Gamma", Chart.StarShape(5), 9, 0xff0040);
-        
-        chart.addLegend(640, 180);
+		yAngle += 2;
+		refreshGraph();
 	}
 
+	public void rotateRigth()
+	{
+		yAngle -= 2;
+		refreshGraph();
+	}
+	
+	public void rotateUp()
+	{
+		zAngle -= 2;
+		refreshGraph();
+	}
+	
+	public void rotateDown()
+	{
+		zAngle += 2;
+		refreshGraph();
+	}
+
+	public void resetRotation()
+	{
+		xAngle = defaultX;
+		yAngle = defaultY;
+		zAngle = defaultZ;
+		refreshGraph();
+	}
 }

@@ -6,6 +6,8 @@ import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
 import math.DwVector;
 import math.PCA;
 import model.EventPoint;
+import model.FCMGraphData;
+import utils.Constants;
 import utils.DBUtils;
 
 public class FeatureProcessor extends FeatureConsumer
@@ -23,9 +25,13 @@ public class FeatureProcessor extends FeatureConsumer
 		double[][] pcaMatrix = DBUtils.loadPCAMatrix();
 		this.pca = new PCA();
 		this.pca.setTransformMatrix(pcaMatrix);
+		//this.pca.setTransformDimension(Constants.numOfDimensions);
 		
 		// load FCA cluster centers
 		this.clusterCenters = DBUtils.loadClusterCenters();
+		
+		FCMGraphData.getInstance().clearAll();
+		FCMGraphData.getInstance().setClusterCenters(clusterCenters);
 		
 		this.distMetric = new FuzzyCMeansParams().getDistanceMetric();
 	}
@@ -36,13 +42,13 @@ public class FeatureProcessor extends FeatureConsumer
 		double[] reducedVector = pca.transformVector(new DwVector(vector)).getVector();
 		int closestCluster = getClosestCluster(reducedVector);
 		
-		EventPoint ep = new EventPoint(reducedVector, closestCluster);
-		
+		// add new point to fcmData
+		FCMGraphData.getInstance().addPoint(new EventPoint(reducedVector, closestCluster));
 	}
 	
 	private int getClosestCluster(double[] point)
 	{
-		double minDist = 0;
+		double minDist = Double.MAX_VALUE;
 		int closestCluster = 0;
 		
 		for(int i = 0; i < clusterCenters.length; i++ )

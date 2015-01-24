@@ -97,11 +97,10 @@ public class DBUtils
 	private static List<double[]> readListFromFile(String fileName)
 	{
 		List<double[]> values = new ArrayList<double[]>();
-		
+		CSVReader reader = null;
 		try
 		{
-			CSVReader reader = new CSVReader(new FileReader(fileName));
-			reader.close();
+			reader = new CSVReader(new FileReader(fileName));
 			
 			String[] line;
 		    while ((line = reader.readNext()) != null)
@@ -112,10 +111,26 @@ public class DBUtils
 		    	
 		    	values.add(doubleLine);
 		    }
+		    
+			reader.close();
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+		finally
+		{
+			if(reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 		return values;
 	}
@@ -135,7 +150,7 @@ public class DBUtils
 				}
 				rows.add(stringRow);
 			}
-			CSVWriter writer = new CSVWriter(new FileWriter(fileName, true));
+			CSVWriter writer = new CSVWriter(new FileWriter(fileName, !fileName.equals(PCA_MATRIX_FILENAME)));
 			writer.writeAll(rows);
 			writer.close();
 		}

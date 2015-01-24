@@ -155,7 +155,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		
 		if(action.equals(mntmPreferences.getText()))
 		{
-			SettingsWindow settingsWindow  = new SettingsWindow();
+			SettingsWindow settingsWindow  = new SettingsWindow(this, true);
 			settingsWindow.setVisible(true);
 		}
 		else if(action.equals(mntmAbout.getText()))
@@ -170,8 +170,11 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 			FCMDialog dialog = new FCMDialog();
 			FCMGraphData data = FCMGraphData.getInstance();
 			EventPoint[] centers = data.getCenters();
-			dialog.setCenters(centers[0], centers[1], centers[2]);
-			dialog.setGroups(data.getPointsFromCluster(0), data.getPointsFromCluster(1), data.getPointsFromCluster(2));
+			if(centers.length == 3){
+				dialog.setCenters(centers[0], centers[1], centers[2]);
+				dialog.setGroups(data.getPointsFromCluster(0), data.getPointsFromCluster(1), data.getPointsFromCluster(2));
+			}
+			
 			dialog.refreshGraph();
 			dialog.setVisible(true);
 		}

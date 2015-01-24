@@ -2,14 +2,17 @@ package gui.settingsWindow;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-public class SettingsWindow extends JDialog
+public class SettingsWindow extends JDialog implements ActionListener
 {
 	private static final long serialVersionUID = -8120511484901187729L;
 	private final JPanel contentPanel = new JPanel();
@@ -32,7 +35,7 @@ public class SettingsWindow extends JDialog
 		
 		try
 		{
-			SettingsWindow dialog = new SettingsWindow();
+			SettingsWindow dialog = new SettingsWindow(null, true);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		}
@@ -45,10 +48,10 @@ public class SettingsWindow extends JDialog
 	/**
 	 * Create the dialog.
 	 */
-	public SettingsWindow()
+	public SettingsWindow(JFrame parent, boolean modal)
 	{
+		super(parent, modal);
 		setName("Settings");
-		setModal(true);
 		setBounds(100, 100, 639, 408);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -68,9 +71,16 @@ public class SettingsWindow extends JDialog
 		getRootPane().setDefaultButton(saveButton);
 
 		cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(this);
 		cancelButton.setActionCommand("Cancel");
 		buttonPane.add(cancelButton);
 
 	}
 
+	public void actionPerformed(ActionEvent e) {
+		Object source = e.getSource();
+		if(source == cancelButton)
+			this.dispose();
+		
+	}
 }

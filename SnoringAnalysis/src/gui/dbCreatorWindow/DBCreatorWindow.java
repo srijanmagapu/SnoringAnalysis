@@ -29,6 +29,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import businessLayer.IModeSwitcher.Mode;
 import controllers.IStartProcessingHandler;
 
 public class DBCreatorWindow extends JDialog implements TreeSelectionListener, ActionListener
@@ -213,7 +214,7 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, A
 			String[] pathes = new String[selectedFiles.size()];
 			pathes = selectedFiles.toArray(new String[0]);
 			
-			handler.startProcessing(SoundSource.File, pathes);
+			handler.startProcessing(SoundSource.File, pathes, Mode.Training);
 		}
 	}
 	

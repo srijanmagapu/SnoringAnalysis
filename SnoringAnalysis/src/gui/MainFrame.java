@@ -2,6 +2,7 @@ package gui;
 
 import gui.conrollers.ProcessHandlerController;
 import gui.conrollers.ProgressBarController;
+import gui.graphs.FCMDialog;
 import gui.interfaces.IGraphsPanel;
 import gui.interfaces.IMainFrame;
 import gui.interfaces.IProgressBar;
@@ -27,6 +28,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
+import model.EventPoint;
+import model.FCMGraphData;
 import controllers.IStartProcessingHandler;
 
 public class MainFrame extends JFrame implements ActionListener, IMainFrame
@@ -101,6 +104,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		menuBar.add(mnTools);
 		
 		mntmClusterring = new JMenuItem("Clusterring");
+		mntmClusterring.addActionListener(this);
 		mntmClusterring.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		mnTools.add(mntmClusterring);
 		
@@ -160,6 +164,16 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 			about.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			about.setLocationRelativeTo(this);
 			about.setVisible(true);
+		}
+		else if(action.equals(mntmClusterring.getText()))
+		{
+			FCMDialog dialog = new FCMDialog();
+			FCMGraphData data = FCMGraphData.getInstance();
+			EventPoint[] centers = data.getCenters();
+			dialog.setCenters(centers[0], centers[1], centers[2]);
+			dialog.setGroups(data.getPointsFromCluster(0), data.getPointsFromCluster(1), data.getPointsFromCluster(2));
+			dialog.refreshGraph();
+			dialog.setVisible(true);
 		}
 	}
 

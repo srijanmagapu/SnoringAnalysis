@@ -18,12 +18,11 @@
 	<classpathentry kind="lib" path="lib/jai_codec-1.1.3-alpha.jar"/>
 	<classpathentry kind="lib" path="lib/ojalgo-37.0.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.carbon.macosx-3.3.3.jar"/>
-	<classpathentry kind="lib" path="lib/jzy3d-api-0.9.1.jar" sourcepath="/jzy3d-api"/>
-	<classpathentry kind="lib" path="lib/jzy3d-swt-0.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/gluegen-rt-android-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="lib/jogl-all-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="lib/jogl-all.jar"/>
+	<classpathentry kind="lib" path="lib/ChartDirector_s.jar" sourcepath="/chartDirector/javademo">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/chartDirector/ide_javadoc/cd_javadoc.zip!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/clodhopper-core"/>
 	<classpathentry kind="lib" path="lib/opencsv-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>

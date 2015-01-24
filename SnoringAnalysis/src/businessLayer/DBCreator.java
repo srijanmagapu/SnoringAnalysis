@@ -2,6 +2,7 @@ package businessLayer;
 
 import math.DwVector;
 import math.PCA;
+import model.FCMGraphData;
 
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansClusterer;
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
@@ -72,6 +73,21 @@ public class DBCreator extends FeatureConsumer
 			FuzzyCMeansClusterer fcmClusterer = new FuzzyCMeansClusterer(fcmData, fcmParams);
 			fcmClusterer.run();
 
+			double[][] centers = new double[numberOfClusters][requiredDimension];
+
+			for (int i = 0; i < numberOfClusters; i++)
+			{
+				centers[i] = fcmClusterer.getClusterCenter(i);
+			}
+
+			// store cluster centers
+			DBUtils.storeClusterCenters(centers);
+			
+			// set centers for fcm graph
+			FCMGraphData.getInstance().clearAll();
+			FCMGraphData.getInstance().setClusterCenters(centers);
+			
+			
 			// prep point membership for storing
 			double[][] membership = new double[reducedRaw.length][numberOfClusters];
 			for (int i = 0; i < reducedRaw.length; i++)
@@ -82,14 +98,8 @@ public class DBCreator extends FeatureConsumer
 			// store membership and points
 			DBUtils.storePointsWithMembership(reducedRaw, membership);
 
-			double[][] centers = new double[numberOfClusters][requiredDimension];
-
-			for (int i = 0; i < numberOfClusters; i++)
-			{
-				centers[i] = fcmClusterer.getClusterCenter(i);
-			}
-
-			DBUtils.storeClusterCenters(centers);
+			// set points for fcm graph
+			FCMGraphData.getInstance().addPoints(reducedRaw);
 		}
 		catch (Exception e)
 		{

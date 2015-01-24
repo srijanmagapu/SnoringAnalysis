@@ -25,7 +25,7 @@ public class App {
 				try
 				{
 					MainFrame frame = new MainFrame();
-					DispatchManager dm = new DispatchManager(frame);
+					/*DispatchManager dm = */new DispatchManager(frame);
 					frame.setVisible(true);
 				}
 				catch (Exception e)

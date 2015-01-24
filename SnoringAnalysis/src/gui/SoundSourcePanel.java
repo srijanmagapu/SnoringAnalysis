@@ -161,7 +161,7 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 			soundSource = SoundSource.File;
 			btnBrowse.setEnabled(true);
 			btnBrowse.addMouseListener(this);
-			if (filePathTextField.getText() != "" || filePathTextField.getText() != null)
+			if (filePathTextField.getText().equals("") || filePathTextField.getText() != null)
 			{
 				try
 				{

@@ -10,7 +10,7 @@ public class FeatureQueue
 	private BlockingQueue<AudioFeature> energyBuffer = new LinkedBlockingQueue<AudioFeature>();
 	private BlockingQueue<AudioFeature> mfccBuffer = new LinkedBlockingQueue<AudioFeature>();
 	
-	private static FeatureQueue instance;
+	private static volatile FeatureQueue instance;
 	private FeatureQueue(){}
 	
 	public static FeatureQueue getInstance()

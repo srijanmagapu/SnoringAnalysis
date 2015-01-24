@@ -2,7 +2,6 @@ package gui.dbCreatorWindow;
 
 import gui.conrollers.ProcessHandlerController;
 import gui.conrollers.ProgressBarController;
-import gui.interfaces.IProgressBar;
 import gui.interfaces.ISourcePanel.SoundSource;
 
 import java.awt.BorderLayout;
@@ -101,6 +100,15 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, A
 			public Class<?> getColumnClass(int columnIndex)
 			{
 				return columnIndex == 0 ? Boolean.class : super.getColumnClass(columnIndex);
+			}
+			
+			@Override
+			public boolean isCellEditable(int row, int col)
+			{
+				if(col == 1)
+					return false;
+				else
+					return true;
 			}
 		};
 

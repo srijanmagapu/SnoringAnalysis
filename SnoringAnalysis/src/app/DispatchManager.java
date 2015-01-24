@@ -228,6 +228,10 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 			new SignalGraphController(mfccView, mfccBuffer);
 			
 		}
+		else if(processingMode == Mode.Training)
+		{
+			switchSound(false);
+		}
 		
 		//Audio Player
 		try

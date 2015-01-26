@@ -100,7 +100,6 @@ public class MFCCProcessor implements AudioProcessor
 		feature.setEndTime(eventEnd);
 		
 		count++;
-		System.out.println("Adding MFCC vector " + count);
 		FeatureQueue.getInstance().addMFCCBuffer(feature);
 		
 		signalBuffer.setBuffer(mfcc);

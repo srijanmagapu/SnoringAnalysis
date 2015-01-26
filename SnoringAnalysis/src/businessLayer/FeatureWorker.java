@@ -16,7 +16,7 @@ public class FeatureWorker implements Runnable
 	
 	public FeatureWorker(FeatureQueue featureQueue)
 	{
-		this.queue = (FeatureQueue) featureQueue;
+		this.queue = featureQueue;
 		workerList.add(this);
 	}
 	

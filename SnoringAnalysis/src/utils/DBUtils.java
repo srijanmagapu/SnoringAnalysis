@@ -150,7 +150,7 @@ public class DBUtils
 				}
 				rows.add(stringRow);
 			}
-			CSVWriter writer = new CSVWriter(new FileWriter(fileName, !fileName.equals(PCA_MATRIX_FILENAME)));
+			CSVWriter writer = new CSVWriter(new FileWriter(fileName, needAppend(fileName)));
 			writer.writeAll(rows);
 			writer.close();
 		}
@@ -183,5 +183,14 @@ public class DBUtils
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private static boolean needAppend(String fileName)
+	{
+		boolean toAppend = true;
+		if(fileName.equals(CLUSTERS_CENTERS_FILENAME) || fileName.equals(PCA_MATRIX_FILENAME))
+			toAppend = false;
+		
+		return toAppend;
 	}
 }

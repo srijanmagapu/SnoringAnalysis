@@ -39,4 +39,11 @@ public class FeatureQueue
 	{
 		return mfccBuffer.take();
 	}
+	
+	public FeatureQueue initQueue()
+	{
+		instance.energyBuffer = new LinkedBlockingQueue<AudioFeature>();
+		instance.mfccBuffer = new LinkedBlockingQueue<AudioFeature>();
+		return instance;
+	}
 }

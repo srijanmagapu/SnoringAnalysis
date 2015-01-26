@@ -35,9 +35,9 @@ public class ProgressBarController implements IProgressBar
 		stack.offerFirst(bar);
 	}
 	
-	public void removeProgressBar()
+	public void removeProgressBar(JProgressBar bar)
 	{
-		stack.poll();
+		stack.remove(bar);
 	}
 
 	@Override

@@ -167,7 +167,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		}
 		else if(action.equals(mntmClusterring.getText()))
 		{
-			FCMDialog dialog = new FCMDialog();
+			FCMDialog dialog = new FCMDialog(this, true);
 			FCMGraphData data = FCMGraphData.getInstance();
 			EventPoint[] centers = data.getCenters();
 			if(centers.length == 3){
@@ -207,7 +207,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	@Override
 	public void dispose()
 	{
-		ProgressBarController.getInstance().removeProgressBar();
+		ProgressBarController.getInstance().removeProgressBar(progressBar);
 		super.dispose();
 	}
 }

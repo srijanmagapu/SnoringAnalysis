@@ -9,7 +9,12 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.UIManager;
 
 public class App {
-	
+	/**
+	 * Entry point
+	 * @param args
+	 * @throws UnsupportedAudioFileException
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws UnsupportedAudioFileException, IOException
 	{
 		try
@@ -25,7 +30,7 @@ public class App {
 				try
 				{
 					MainFrame frame = new MainFrame();
-					/*DispatchManager dm = */new DispatchManager(frame);
+					new DispatchManager(frame);
 					frame.setVisible(true);
 				}
 				catch (Exception e)

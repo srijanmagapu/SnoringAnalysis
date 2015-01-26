@@ -33,6 +33,8 @@ public class DBCreator extends FeatureConsumer
 			if (data.size() == 0)
 				throw new Exception("DBCreator: No data to preceed.");
 
+			System.out.println("BDCreator: number of vectros: " + data.size());
+			
 			DBUtils.storeRawFeatures(data);
 
 			// create array of vectors from raw data

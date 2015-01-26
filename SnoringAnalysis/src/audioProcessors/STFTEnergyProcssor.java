@@ -240,7 +240,6 @@ public class STFTEnergyProcssor implements AudioProcessor
 		feature.setEndTime(eventEnd);
 		
 		count++;
-		System.out.println("Adding Energy vector " + count);
 		FeatureQueue.getInstance().addEnergyBuffer(feature);
 
 		//create signalTDBuffer

@@ -58,6 +58,8 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	private EventPoint[] centers;
 	private EventPoint[][] groups;
 	
+	private boolean[] showCategory = new boolean[] {true, true, true};
+	
 	public FCM3DScatterPanel()
 	{
 		setLayout(new BorderLayout(0, 0));
@@ -117,6 +119,9 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	@Override
 	public void setCenters(EventPoint center1, EventPoint center2, EventPoint center3)
 	{
+		System.out.printf("Center 1: (%.3f, %.3f, %.3f )\n", center1.getCoordinates()[0], center1.getCoordinates()[1], center1.getCoordinates()[2]);
+		System.out.printf("Center 2: (%.3f, %.3f, %.3f )\n", center2.getCoordinates()[0], center2.getCoordinates()[1], center2.getCoordinates()[2]);
+		System.out.printf("Center 3: (%.3f, %.3f, %.3f )\n", center3.getCoordinates()[0], center3.getCoordinates()[1], center3.getCoordinates()[2]);
 		setCenter(center1);
 		setCenter(center2);
 		setCenter(center3);
@@ -131,6 +136,10 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	@Override
 	public void setGroups(EventPoint[] group1, EventPoint[] group2, EventPoint[] group3)
 	{
+		System.out.println("---------------------------------------");
+		System.out.println("cat1: " + group1.length + " points");
+		System.out.println("cat2: " + group2.length + " points");
+		System.out.println("cat3: " + group3.length + " points");
 		setGroup(group1);
 		setGroup(group2);
 		setGroup(group3);
@@ -139,9 +148,6 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	@Override
 	public void setGroup(EventPoint[] group)
 	{
-		System.out.println("-------------------------------");
-		System.out.println("groups size " + groups.length);
-		System.out.println("group size " + group.length);
 		if(group != null && group.length > 0)
 			groups[group[0].getCluster()] = group;
 	}
@@ -154,7 +160,11 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 			addCenterToChart(chart, centers[i]);
 		
 		for(int i = 0; i < groups.length; i++)
-			addGroupToChart(chart, groups[i]);
+		{
+			EventPoint[] group = groups[i];
+			if(group != null && group.length > 0 && showCategory[group[0].getCluster()])
+				addGroupToChart(chart, groups[i]);
+		}
 		
 		this.remove(viewer);
 		viewer = createViewer(chart);
@@ -214,13 +224,13 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 				switch(group[0].getCluster())
 				{
 				case 0:
-					chart.addScatterGroup(xData, yData, zData, "Cat1", breathingPointShape, breathingPointSize, breathingPointColor);
+					chart.addScatterGroup(xData, yData, zData, "Cat1 (" + group.length + ")", breathingPointShape, breathingPointSize, breathingPointColor);
 					break;
 				case 1:
-					chart.addScatterGroup(xData, yData, zData, "Cat2", snoringPointShape, snoringPointSize, snoringPointColor);
+					chart.addScatterGroup(xData, yData, zData, "Cat2 (" + group.length + ")", snoringPointShape, snoringPointSize, snoringPointColor);
 					break;
 				case 2:
-					chart.addScatterGroup(xData, yData, zData, "Cat3", noisePointShape, noisePointSize, noisePointColor);
+					chart.addScatterGroup(xData, yData, zData, "Cat3 (" + group.length + ")", noisePointShape, noisePointSize, noisePointColor);
 					break;
 				}
 			}
@@ -237,11 +247,6 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 		setCenters(createRundomPoint(0), createRundomPoint(1), createRundomPoint(2));
 		setGroups(createRandomGroup(0, 50), createRandomGroup(1, 50), createRandomGroup(2, 50));
 		refreshGraph();
-		
-		/*chart = createChart();
-		addRandomPointsToChart(chart);
-		viewer.setChart(chart);
-		viewer.updateDisplay();*/
 	}
 	
 	private EventPoint[] createRandomGroup(int cluster, int size)
@@ -267,35 +272,33 @@ public class FCM3DScatterPanel extends JPanel implements IFCMDialog
 	}
 	
 
-	public void rotateLeft()
+	public void rotateHorizontal(int value)
 	{
-		yAngle += 2;
+		yAngle = (value + defaultY) % 360;;
 		refreshGraph();
 	}
 
-	public void rotateRigth()
+	public void rotateVertical(int value)
 	{
-		yAngle -= 2;
+		zAngle = (value + defaultZ) % 360;
 		refreshGraph();
 	}
 	
-	public void rotateUp()
+	public void showCat1Points(boolean show)
 	{
-		zAngle -= 2;
+		showCategory[0] = show;
 		refreshGraph();
 	}
 	
-	public void rotateDown()
+	public void showCat2Points(boolean show)
 	{
-		zAngle += 2;
+		showCategory[1] = show;
 		refreshGraph();
 	}
-
-	public void resetRotation()
+	
+	public void showCat3Points(boolean show)
 	{
-		xAngle = defaultX;
-		yAngle = defaultY;
-		zAngle = defaultZ;
+		showCategory[2] = show;
 		refreshGraph();
 	}
 }

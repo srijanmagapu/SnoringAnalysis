@@ -4,10 +4,12 @@ import gui.conrollers.ProcessHandlerController;
 import gui.conrollers.ProgressBarController;
 import gui.interfaces.ISourcePanel.SoundSource;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -228,7 +230,7 @@ public class DBCreatorWindow extends JDialog implements TreeSelectionListener, A
 	@Override
 	public void dispose()
 	{
-		ProgressBarController.getInstance().removeProgressBar();
+		ProgressBarController.getInstance().removeProgressBar(progressBar);
 		super.dispose();
 	}
 

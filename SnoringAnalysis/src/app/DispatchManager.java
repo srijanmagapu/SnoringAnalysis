@@ -1,8 +1,5 @@
 package app;
 
-import java.io.File;
-import java.io.IOException;
-
 import gui.graphs.AreaGraph;
 import gui.interfaces.IMainFrame;
 import gui.interfaces.IPlaySoundSwitcher;
@@ -10,18 +7,16 @@ import gui.interfaces.IProgressBar;
 import gui.interfaces.ISignalGraph;
 import gui.interfaces.ISourcePanel.SoundSource;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import utils.Constants;
 import model.ProgressData;
 import model.SignalBuffer;
-import controllers.EnergyGraphController;
-import controllers.FDGraphController;
-import controllers.IStartProcessingHandler;
-import controllers.ProcessProgressController;
-import controllers.SignalGraphController;
+import utils.Constants;
 import audioProcessors.DummyProcessor;
 import audioProcessors.MFCCProcessor;
 import audioProcessors.PreProcessor;
@@ -37,40 +32,118 @@ import businessLayer.FeatureQueue;
 import businessLayer.FeatureWorker;
 import businessLayer.IFeatureConsumer;
 import businessLayer.IModeSwitcher;
-import businessLayer.IModeSwitcher.Mode;
+import controllers.EnergyGraphController;
+import controllers.FDGraphController;
+import controllers.IStartProcessingHandler;
+import controllers.ProcessProgressController;
+import controllers.SignalGraphController;
 
+/**
+ * This class is the heart of the system. Here is the sound processing is initialized and started.
+ * It uses TarsosDSP framework for reading and processing files.
+ * It can work in two modes: Training and Analyzing - the first used for creating data base of
+ * features, when the later analyzes the sound record, extracts sound events and categorizes it
+ * based on data base created by Training mode.
+ * @author Gao
+ *
+ */
 public class DispatchManager implements IStartProcessingHandler, Runnable, IModeSwitcher, IPlaySoundSwitcher
 {
+	/**
+	 * The size of window in ms that shall be dispatched by AudioDispatcher
+	 */
 	private static final int windowSizeInMs = 50;
+	/**
+	 * The required stream sample rate
+	 */
 	private static final int sampleRate = 10240;
+	/**
+	 * The size of window in samples that shall be dispatched by AudioDispatcher
+	 */
 	private static final int audioBufferSize = sampleRate / 1000 * windowSizeInMs;	//512
+	/**
+	 * The required overlap between two sequential windows dispatched by AudioDispatcher
+	 */
 	private static final int bufferOverlap = audioBufferSize / 2; 	//256
 	
+	/**
+	 * Minimal frequency band. All data below this value shall be filtered out before
+	 * feature extraction is started
+	 */
 	private static final int minFreq = 150;
+	/**
+	 * Maximum frequency band. All data above this value shall be filtered out before
+	 * feature extraction is started
+	 */
 	private static final int maxFreq = 5000;
 	
+	/**
+	 * The working frequency range
+	 */
 	private static final int freqWidth = (maxFreq - minFreq)/2;
+	/**
+	 * The central point of working frequency range
+	 */
 	private static final int centerFreq = freqWidth + minFreq;
 	
+	/**
+	 * The frequency band size that shall be used for computation of each energy value
+	 */
 	private static final int energyFreqBand = 500;
 	private static final int numOfEnergyBands = maxFreq / energyFreqBand;	//10
 	
+	/**
+	 * Required amount of MFCC coefs
+	 */
 	private static final int amountOfCepstrumCoef = 10;
+	/**
+	 * Required amount of MFCC filters
+	 */
 	private static final int amountOfMelFilters = 10;
 	
+	/**
+	 * The main AudioDispatcher used for actual sound processing
+	 */
 	private AudioDispatcher mainDispatcher;
+	/**
+	 * The dummy processor used to interrupt sound processing
+	 */
 	private DummyProcessor dummyProcessor;
 	
+	/**
+	 * The processing mode
+	 */
 	private Mode processingMode = Mode.Training;
 	
+	/**
+	 * Indicates if the processed sound shall be played
+	 */
 	private boolean playAudio;
+	/**
+	 * Audio player used to play audio during processing
+	 */
 	private SwitchableAudioPlayer audioPlayer = null;
 	
+	/**
+	 * The main GUI frame
+	 */
 	private IMainFrame mainFrame;
 	
+	/**
+	 * Array of files that shall be processed
+	 */
 	private String[] filesToProcess;
+	
+	/**
+	 * The sound source to get the data to process
+	 */
 	private SoundSource soundSource = SoundSource.File;
 	
+	/**
+	 * Create DispatchManager
+	 * @param frame - the main frame used for sending commands 
+	 * to dispatcher and receiving results.
+	 */
 	public DispatchManager(IMainFrame frame)
 	{
 		this.mainFrame = frame;
@@ -112,6 +185,10 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		}
 	}
 	
+	/**
+	 * Process files from array
+	 * @param pathes - array of full paths to files that shall be processed
+	 */
 	private void processFiles(String[] pathes)
 	{
 		//set FeatureWorker
@@ -126,7 +203,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 			break;
 		}
 
-		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance());
+		FeatureWorker worker = new FeatureWorker(FeatureQueue.getInstance().initQueue());
 		worker.setIConsumer(iConsumer);
 		(new Thread(worker, "FeatureWorker")).start();
 		
@@ -158,7 +235,16 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		
 	}
 
-	
+	/**
+	 * Performed before actual processing is started.
+	 * It used for analyzing the sound file and 
+	 * calculating the height of V-BOX. 
+	 * 
+	 * @param path - full path to the file
+	 * @return V-BOX height
+	 * @throws UnsupportedAudioFileException
+	 * @throws IOException
+	 */
 	private double preProcessAudio(String path) throws UnsupportedAudioFileException, IOException
 	{
 		JVMAudioInputStream preProcessorStream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
@@ -174,6 +260,19 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 		return preProessor.getCaculatedheight();
 	}
 	
+	/**
+	 * The actual processing of the file. It creates the TarsosDSP AudioDispatcher
+	 * based on file, that it's full path is passed as a parameter.
+	 * It uses following processors:
+	 * 	1. BandPass filter to filter the signal in range [150, 5000].
+	 * 	2. VerticalBoxProcessor that recognizes the sound events.
+	 * 	3. STFTEnergyProcssor that calculates the signal Temporal Energy.
+	 * 	4. MFCCProcessor that computes the MFCC.
+	 * @param vboxHeight - the V-Box H parameter to use
+	 * @param path - the full path to the file to process
+	 * @throws UnsupportedAudioFileException
+	 * @throws IOException
+	 */
 	public void processAudio( double vboxHeight, String path ) throws UnsupportedAudioFileException, IOException
 	{
 		JVMAudioInputStream stream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );

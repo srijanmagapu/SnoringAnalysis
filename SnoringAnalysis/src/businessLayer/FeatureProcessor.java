@@ -15,7 +15,7 @@ public class FeatureProcessor extends FeatureConsumer
 	private PCA pca;
 	private double[][] clusterCenters;
 	private DistanceMetric distMetric;
-	
+	private int vectorsCounter;
 	
 	public FeatureProcessor(int dim, int numberOfClusters)
 	{
@@ -25,7 +25,6 @@ public class FeatureProcessor extends FeatureConsumer
 		double[][] pcaMatrix = DBUtils.loadPCAMatrix();
 		this.pca = new PCA();
 		this.pca.setTransformMatrix(pcaMatrix);
-		//this.pca.setTransformDimension(Constants.numOfDimensions);
 		
 		// load FCA cluster centers
 		this.clusterCenters = DBUtils.loadClusterCenters();
@@ -44,6 +43,7 @@ public class FeatureProcessor extends FeatureConsumer
 		
 		// add new point to fcmData
 		FCMGraphData.getInstance().addPoint(new EventPoint(reducedVector, closestCluster));
+		vectorsCounter++;
 	}
 	
 	private int getClosestCluster(double[] point)
@@ -67,7 +67,7 @@ public class FeatureProcessor extends FeatureConsumer
 	@Override
 	public void run()
 	{
-		
+		System.out.println("FeatureProcessor: number of vectors " + vectorsCounter);
 	}
 	
 

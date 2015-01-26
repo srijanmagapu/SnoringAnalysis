@@ -5,8 +5,11 @@ import gui.interfaces.IFCMDialog;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -16,21 +19,42 @@ import model.EventPoint;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.ImageIcon;
 
-public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
+import javax.swing.ImageIcon;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.JCheckBox;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.Box;
+
+public class FCMDialog extends JDialog implements IFCMDialog, ActionListener, ChangeListener
 {
 	private static final long serialVersionUID = 1475528859878123947L;
-	
+
 	private final JPanel contentPanel = new JPanel();
 	private FCM3DScatterPanel m3DScatterPanel;
 	private JButton randomButton;
 	private JButton cancelButton;
-	private JButton btnleft;
-	private JButton btnRigth;
-	private JButton btnUp;
-	private JButton btnDown;
 	private JButton btnReset;
+	private JPanel buttonPanel;
+	private JSlider horizontSlider;
+	private JSlider verticalSlider;
+	private JPanel dControlPanel;
+	private JPanel rControlPanel;
+	private JCheckBox chckbxCat1;
+	private JCheckBox chckbxCat2;
+	private JCheckBox chckbxCat3;
+	private JPanel chckPanel;
+	private Component horizontalStrut;
+	private Component horizontalStrut_1;
 
 	/**
 	 * Launch the application.
@@ -40,7 +64,7 @@ public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			FCMDialog dialog = new FCMDialog();
+			FCMDialog dialog = new FCMDialog(null, true);
 			dialog.setVisible(true);
 		}
 		catch (Exception e)
@@ -52,102 +76,114 @@ public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 	/**
 	 * Create the dialog.
 	 */
-	public FCMDialog()
+	public FCMDialog(JFrame parent, boolean modal)
 	{
+		super(parent, modal);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 745, 602);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
+		contentPanel.setLayout(new BorderLayout(0, 0));
 
 		m3DScatterPanel = new FCM3DScatterPanel();
 		contentPanel.add(m3DScatterPanel);
 		m3DScatterPanel.setLayout(new BoxLayout(m3DScatterPanel, BoxLayout.X_AXIS));
 
-		JPanel buttonPane = new JPanel();
-		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		getContentPane().add(buttonPane, BorderLayout.SOUTH);
+		verticalSlider = new JSlider();
+		verticalSlider.addChangeListener(this);
+		verticalSlider.setMinorTickSpacing(10);
+		verticalSlider.setValue(0);
+		verticalSlider.setPaintTicks(true);
+		verticalSlider.setMinimum(-180);
+		verticalSlider.setMaximum(180);
+		verticalSlider.setOrientation(SwingConstants.VERTICAL);
+		contentPanel.add(verticalSlider, BorderLayout.WEST);
+		
+		rControlPanel = new JPanel();
+		rControlPanel.setBackground(Color.WHITE);
+		contentPanel.add(rControlPanel, BorderLayout.EAST);
+		rControlPanel.setLayout(new BoxLayout(rControlPanel, BoxLayout.X_AXIS));
+		
+		horizontalStrut_1 = Box.createHorizontalStrut(5);
+		rControlPanel.add(horizontalStrut_1);
+		
+		chckPanel = new JPanel();
+		chckPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		rControlPanel.add(chckPanel);
+		chckPanel.setLayout(new BoxLayout(chckPanel, BoxLayout.Y_AXIS));
+		
+		chckbxCat1 = new JCheckBox("Cat1");
+		chckbxCat1.setSelected(true);
+		chckbxCat1.addChangeListener(this);
+		chckPanel.add(chckbxCat1);
+		
+		chckbxCat2 = new JCheckBox("Cat2");
+		chckbxCat2.setSelected(true);
+		chckbxCat2.addChangeListener(this);
+		chckPanel.add(chckbxCat2);
+		
+		chckbxCat3 = new JCheckBox("Cat3");
+		chckbxCat3.setSelected(true);
+		chckbxCat3.addChangeListener(this);
+		chckPanel.add(chckbxCat3);
+		
+		horizontalStrut = Box.createHorizontalStrut(5);
+		rControlPanel.add(horizontalStrut);
+
+		dControlPanel = new JPanel();
+		getContentPane().add(dControlPanel, BorderLayout.SOUTH);
+
+		dControlPanel.setLayout(new BorderLayout(0, 0));
+
+		buttonPanel = new JPanel();
+		dControlPanel.add(buttonPanel, BorderLayout.EAST);
+
+		btnReset = new JButton("Reset");
+		buttonPanel.add(btnReset);
 
 		randomButton = new JButton("Random");
+		buttonPanel.add(randomButton);
 		randomButton.addActionListener(this);
-		
-		btnleft = new JButton("");
-		btnleft.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/left.png")));
-		btnleft.addActionListener(this);
-		
-		btnDown = new JButton("");
-		btnDown.addActionListener(this);
-		btnDown.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/down.png")));
-		buttonPane.add(btnDown);
-		
-		btnUp = new JButton("");
-		btnUp.addActionListener(this);
-		btnUp.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/up.png")));
-		buttonPane.add(btnUp);
-		buttonPane.add(btnleft);
-		
-		btnRigth = new JButton("");
-		btnRigth.addActionListener(this);
-		btnRigth.setIcon(new ImageIcon(FCMDialog.class.getResource("/gui/icons/arrows/right.png")));
-		buttonPane.add(btnRigth);
-		
-		btnReset = new JButton("Reset");
-		btnReset.addActionListener(this);
-		buttonPane.add(btnReset);
 		randomButton.setActionCommand("random");
-		buttonPane.add(randomButton);
 		getRootPane().setDefaultButton(randomButton);
 
 		cancelButton = new JButton("Cancel");
+		buttonPanel.add(cancelButton);
 		cancelButton.addActionListener(this);
 		cancelButton.setActionCommand("Cancel");
-		buttonPane.add(cancelButton);
+
+		horizontSlider = new JSlider();
+		horizontSlider.addChangeListener(this);
+		horizontSlider.setValue(0);
+		horizontSlider.setPaintTicks(true);
+		horizontSlider.setMinorTickSpacing(10);
+		horizontSlider.setMinimum(-180);
+		horizontSlider.setMaximum(180);
+		dControlPanel.add(horizontSlider, BorderLayout.CENTER);
+		btnReset.addActionListener(this);
 
 		this.pack();
 	}
 
+	public void actionPerformed(ActionEvent e)
+	{
 
-	public void actionPerformed(ActionEvent e) {
-		
 		Object source = e.getSource();
-		if(source == randomButton)
+		if (source == randomButton)
 		{
 			m3DScatterPanel.randomChart();
 			this.revalidate();
 			this.repaint();
 		}
-		else if (source == btnleft)
-		{
-			m3DScatterPanel.rotateLeft();
-			this.revalidate();
-			this.repaint();
-		}
-		else if (source == btnRigth)
-		{
-			m3DScatterPanel.rotateRigth();
-			this.revalidate();
-			this.repaint();
-		}
-		else if (source == btnUp)
-		{
-			m3DScatterPanel.rotateUp();
-			this.revalidate();
-			this.repaint();
-		}
-		else if (source == btnDown)
-		{
-			m3DScatterPanel.rotateDown();
-			this.revalidate();
-			this.repaint();
-		}
 		else if (source == btnReset)
 		{
-			m3DScatterPanel.resetRotation();
+			horizontSlider.setValue(0);
+			verticalSlider.setValue(0);
 			this.revalidate();
 			this.repaint();
 		}
-		else if(source == cancelButton)
+		else if (source == cancelButton)
 		{
 			this.dispose();
 		}
@@ -177,10 +213,37 @@ public class FCMDialog extends JDialog implements IFCMDialog, ActionListener
 		m3DScatterPanel.setGroup(group);
 	}
 
-
 	@Override
 	public void refreshGraph()
 	{
 		m3DScatterPanel.refreshGraph();
+	}
+
+	public void stateChanged(ChangeEvent e)
+	{
+		Object source = e.getSource();
+		if (source == horizontSlider)
+		{
+			m3DScatterPanel.rotateHorizontal(horizontSlider.getValue());
+			
+		}
+		else if (source == verticalSlider)
+		{
+			m3DScatterPanel.rotateVertical(verticalSlider.getValue());
+		}
+		else if(source == chckbxCat1)
+		{
+			m3DScatterPanel.showCat1Points(chckbxCat1.isSelected());
+		}
+		else if(source == chckbxCat2)
+		{
+			m3DScatterPanel.showCat2Points(chckbxCat2.isSelected());
+		}
+		else if(source == chckbxCat3)
+		{
+			m3DScatterPanel.showCat3Points(chckbxCat3.isSelected());
+		}
+		
+		this.revalidate();
 	}
 }

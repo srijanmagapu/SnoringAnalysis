@@ -12,7 +12,7 @@ import be.tarsos.dsp.AudioProcessor;
 
 public class PreProcessor implements AudioProcessor
 {
-	private double arbitraryScaling = 1;
+	private double arbitraryScaling = 8;
 	private double calculatedHeight = 0.1;
 	private List<double[]> amplitudes = new ArrayList<double[]>();
 	

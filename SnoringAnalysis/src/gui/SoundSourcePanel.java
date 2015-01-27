@@ -41,8 +41,6 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 	private JTextField filePathTextField;
 	private File chosenFile;
 	private SoundSource soundSource = DEFAULT_SOUNDSOURCE;
-	private JRadioButton rdbtnMic;
-	private JRadioButton rdbtnFile;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JButton btnBrowse;
 	private JButton btnStartStop;
@@ -65,17 +63,6 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 
 		leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
-
-		rdbtnMic = new JRadioButton("Microphone");
-		leftPanel.add(rdbtnMic);
-		rdbtnMic.addActionListener(this);
-		buttonGroup.add(rdbtnMic);
-
-		rdbtnFile = new JRadioButton("File");
-		leftPanel.add(rdbtnFile);
-		rdbtnFile.addActionListener(this);
-		rdbtnFile.setSelected(true);
-		buttonGroup.add(rdbtnFile);
 
 		btnBrowse = new JButton("Browse");
 		leftPanel.add(btnBrowse);
@@ -147,34 +134,8 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 	public void actionPerformed(ActionEvent e)
 	{
 		Object source = e.getSource();
-		// Mic
-		if (source == rdbtnMic)
-		{
-			soundSource = SoundSource.Mic;
-			btnBrowse.setEnabled(false);
-			btnBrowse.removeMouseListener(this);
-			chosenFile = null;
-
-		}
-		// File
-		else if (source == rdbtnFile)
-		{
-			soundSource = SoundSource.File;
-			btnBrowse.setEnabled(true);
-			btnBrowse.addMouseListener(this);
-			if (filePathTextField.getText().equals("") || filePathTextField.getText() != null)
-			{
-				try
-				{
-					chosenFile = new File(filePathTextField.getText());
-				}
-				catch (Exception ex)
-				{
-					System.err.println("Cant open file" + filePathTextField.getText());
-				}
-			}
-		}
-		else if(source == chckBoxPlaySound)
+		
+		if(source == chckBoxPlaySound)
 		{
 			for(IPlaySoundSwitcher sw : playSoundSwitcher)
 			{

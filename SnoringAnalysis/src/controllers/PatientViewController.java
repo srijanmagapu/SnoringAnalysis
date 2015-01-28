@@ -30,8 +30,6 @@ public class PatientViewController extends SignalGraphController
             public void run()
 			{
             	((IPatientView)view).setEventPoints(FCMGraphData.getInstance().getPoints());
-            	float[] buffer = ((SignalBuffer)sender).getBuffer();
-				//view.setData(createXData(buffer), createYData(buffer));
             	view.setData(x, y);
 			}
 		});
@@ -41,16 +39,8 @@ public class PatientViewController extends SignalGraphController
 	protected double[] createXData(float[] data)
 	{
 		double[] xData = new double[data.length];
-		float sampleRate = buffer.getSampleRate();
-		System.out.println("PatientController len = " + data.length);
-		System.out.println("PatientController sr = " + sampleRate);
-		System.out.println("PatientController len / sr = " + data.length / 44100);
-/*		for(int i = 0; i < data.length; i++)
-			xData[i] = i + 1;*/
-		
 		for(int i = 0; i < data.length; i++)
 			xData[i] = (i*1000) / 44100;
-		
 		
 		return xData;
 	}

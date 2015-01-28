@@ -2,6 +2,7 @@ package audioProcessors;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansClusterer;
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
 import org.battelle.clodhopper.tuple.ArrayTupleList;
@@ -12,7 +13,7 @@ import be.tarsos.dsp.AudioProcessor;
 
 public class PreProcessor implements AudioProcessor
 {
-	private double arbitraryScaling = 4;
+	private double arbitraryScaling = 5;
 	private double calculatedHeight = 0.1;
 	private List<double[]> amplitudes = new ArrayList<double[]>();
 	
@@ -60,6 +61,7 @@ public class PreProcessor implements AudioProcessor
 		System.out.println(calculatedHeight);
 	}
 	
+	@SuppressWarnings("unused")
 	private double[] mergeBuffers()
 	{
 		int count = 0;

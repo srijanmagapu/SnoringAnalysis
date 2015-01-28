@@ -9,7 +9,6 @@ import gui.interfaces.IMainFrame;
 import gui.interfaces.IPatientView;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISourcePanel;
-import gui.settingsWindow.SettingsWindow;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -32,9 +31,10 @@ import javax.swing.border.EmptyBorder;
 
 import model.EventPoint;
 import model.FCMGraphData;
-import controllers.IStartProcessingHandler;
 
 import org.jfree.chart.JFreeChart;
+
+import controllers.IStartProcessingHandler;
 
 public class MainFrame extends JFrame implements ActionListener, IMainFrame
 {
@@ -50,8 +50,6 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	private JMenu mnTools;
 	private JMenu mnHelp;
 	private JMenuItem mntmAbout;
-	private JMenuItem mntmOpen;
-	private JMenuItem mntmClose;
 	private JMenuItem mntmExit;
 	private JRadioButtonMenuItem rdbtnmntmPatient;
 	private JRadioButtonMenuItem rdbtnmntmResearcher;
@@ -83,13 +81,8 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		mnFile.setMnemonic('F');
 		menuBar.add(mnFile);
 		
-		mntmOpen = new JMenuItem("Open");
-		mnFile.add(mntmOpen);
-		
-		mntmClose = new JMenuItem("Close");
-		mnFile.add(mntmClose);
-		
 		mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(this);
 		mnFile.add(mntmExit);
 		
 		mnView = new JMenu("View");
@@ -200,6 +193,10 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		else if(action.equals(rdbtnmntmResearcher.getText()))
 		{
 			((CardLayout)cardPanel.getLayout()).show(cardPanel, strResearcher);
+		}
+		else if(action.equals(mntmExit.getText()))
+		{
+			this.dispose();
 		}
 	}
 

@@ -18,12 +18,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.Box;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -41,7 +39,6 @@ public class SoundSourcePanel extends JPanel implements ISourcePanel, ActionList
 	private JTextField filePathTextField;
 	private File chosenFile;
 	private SoundSource soundSource = DEFAULT_SOUNDSOURCE;
-	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JButton btnBrowse;
 	private JButton btnStartStop;
 

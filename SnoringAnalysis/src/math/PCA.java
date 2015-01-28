@@ -207,7 +207,7 @@ public class PCA
 			System.out.println("error, cant transform vector");
 		}
 		
-		double[][] emat_dd = emat.getArray();
+		//double[][] emat_dd = emat.getArray();
 		float[] vec_new = new float[rows];
 
 		for (int r = 0; r < rows; r++)

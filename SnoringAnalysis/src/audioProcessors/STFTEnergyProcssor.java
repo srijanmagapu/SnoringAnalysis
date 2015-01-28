@@ -236,8 +236,8 @@ public class STFTEnergyProcssor implements AudioProcessor
 		
 		AudioFeature feature = new AudioFeature();
 		feature.setData(energy);
-		feature.setStartTime(eventStart);
-		feature.setEndTime(eventEnd);
+		feature.setStartTime(eventStart * 1000);
+		feature.setEndTime(eventEnd * 1000);
 		
 		count++;
 		FeatureQueue.getInstance().addEnergyBuffer(feature);

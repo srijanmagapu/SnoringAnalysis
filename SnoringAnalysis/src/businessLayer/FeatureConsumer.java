@@ -3,6 +3,9 @@ package businessLayer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.battelle.clodhopper.distance.DistanceMetric;
+import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
+
 import model.AudioFeature;
 import model.TimeStamp;
 
@@ -13,11 +16,13 @@ public abstract class FeatureConsumer implements IFeatureConsumer
 	protected List<double[]> data = new ArrayList<>();
 	protected List<TimeStamp> timeStamps = new ArrayList<>();
 	protected double[][] pcaMatrix;
+	protected DistanceMetric distMetric;
 	
 	public FeatureConsumer(int dim, int numberOfClusters)
 	{
 		this.requiredDimension = dim;
 		this.numberOfClusters = numberOfClusters;
+		this.distMetric = new FuzzyCMeansParams().getDistanceMetric();
 	}
 	
 	@Override
@@ -43,11 +48,11 @@ public abstract class FeatureConsumer implements IFeatureConsumer
 			mergedVector[i] = energyBuff[i - energyBuff.length];
 		}
 		
-		timeStamps.add(new TimeStamp(energy.getStartTime(), energy.getEndTime()));
-		finishConstuction(mergedVector);
+		TimeStamp ts = new TimeStamp(energy.getStartTime(), energy.getEndTime());
+		finishConstuction(mergedVector, ts);
 	}
 	
-	protected abstract void finishConstuction(double[] vector);
+	protected abstract void finishConstuction(double[] vector, TimeStamp timeStamp);
 	
 	@Override
 	public abstract void run();

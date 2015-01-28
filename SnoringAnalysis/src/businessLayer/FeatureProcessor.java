@@ -1,20 +1,16 @@
 package businessLayer;
 
-import org.battelle.clodhopper.distance.DistanceMetric;
-import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
-
 import math.DwVector;
 import math.PCA;
 import model.EventPoint;
 import model.FCMGraphData;
-import utils.Constants;
+import model.TimeStamp;
 import utils.DBUtils;
 
 public class FeatureProcessor extends FeatureConsumer
 {
 	private PCA pca;
 	private double[][] clusterCenters;
-	private DistanceMetric distMetric;
 	private int vectorsCounter;
 	
 	public FeatureProcessor(int dim, int numberOfClusters)
@@ -32,17 +28,18 @@ public class FeatureProcessor extends FeatureConsumer
 		FCMGraphData.getInstance().clearAll();
 		FCMGraphData.getInstance().setClusterCenters(clusterCenters);
 		
-		this.distMetric = new FuzzyCMeansParams().getDistanceMetric();
 	}
 	
 	@Override
-	protected void finishConstuction(double[] vector)
+	protected void finishConstuction(double[] vector, TimeStamp timeStamp)
 	{
 		double[] reducedVector = pca.transformVector(new DwVector(vector)).getVector();
 		int closestCluster = getClosestCluster(reducedVector);
 		
 		// add new point to fcmData
-		FCMGraphData.getInstance().addPoint(new EventPoint(reducedVector, closestCluster));
+		EventPoint point = new EventPoint(reducedVector, closestCluster);
+		point.setTimeStamp(timeStamp);
+		FCMGraphData.getInstance().addPoint(point);
 		vectorsCounter++;
 	}
 	

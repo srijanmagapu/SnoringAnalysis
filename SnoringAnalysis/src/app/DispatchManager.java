@@ -2,6 +2,7 @@ package app;
 
 import gui.graphs.AreaGraph;
 import gui.interfaces.IMainFrame;
+import gui.interfaces.IPatientView;
 import gui.interfaces.IPlaySoundSwitcher;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISignalGraph;
@@ -35,6 +36,7 @@ import businessLayer.IModeSwitcher;
 import controllers.EnergyGraphController;
 import controllers.FDGraphController;
 import controllers.IStartProcessingHandler;
+import controllers.PatientViewController;
 import controllers.ProcessProgressController;
 import controllers.SignalGraphController;
 
@@ -246,7 +248,7 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	 * @throws IOException
 	 */
 	private double preProcessAudio(String path) throws UnsupportedAudioFileException, IOException
-	{
+	{		
 		JVMAudioInputStream preProcessorStream = new JVMAudioInputStream(AudioSystem.getAudioInputStream(new File(path)) );
 		AudioDispatcher preProcessorDispatcher = new AudioDispatcher(preProcessorStream, audioBufferSize, 0);
 
@@ -322,11 +324,16 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 			//EnergyGraphController energyControler = new EnergyGraphController(energyView, energyBuffer);
 			new EnergyGraphController(energyView, energyBuffer);
 			
-			//MFCC graph
+			// MFCC graph
 			final ISignalGraph mfccView = mainFrame.getIGraphsPanel().getMFCCGraphPanel();
 			final SignalBuffer mfccBuffer = mfccProcessor.getSignalBuffer();
 			//SignalGraphController mfccControler = new SignalGraphController(mfccView, mfccBuffer);
 			new SignalGraphController(mfccView, mfccBuffer);
+			
+			// Patient Panel
+			final IPatientView patientView = mainFrame.getPatientView();
+			final SignalBuffer patientBuffer = dummyProcessor.getSignalBuffer();
+			new PatientViewController(patientView, patientBuffer);
 			
 		}
 		else if(processingMode == Mode.Training)
@@ -363,7 +370,8 @@ public class DispatchManager implements IStartProcessingHandler, Runnable, IMode
 	@Override
 	public void stopProcessing()
 	{
-		dummyProcessor.setInterruptProcessing(true);
+		if(dummyProcessor != null)
+			dummyProcessor.setInterruptProcessing(true);
 	}
 
 

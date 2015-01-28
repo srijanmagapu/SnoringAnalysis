@@ -5,6 +5,7 @@ import gui.conrollers.ProgressBarController;
 import gui.graphs.FCMDialog;
 import gui.interfaces.IGraphsPanel;
 import gui.interfaces.IMainFrame;
+import gui.interfaces.IPatientView;
 import gui.interfaces.IProgressBar;
 import gui.interfaces.ISourcePanel;
 import gui.settingsWindow.SettingsWindow;
@@ -32,6 +33,8 @@ import model.EventPoint;
 import model.FCMGraphData;
 import controllers.IStartProcessingHandler;
 
+import org.jfree.chart.JFreeChart;
+
 public class MainFrame extends JFrame implements ActionListener, IMainFrame
 {
 
@@ -57,7 +60,10 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	private JPanel cardPanel;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JProgressBar progressBar;
+	private PatientPanel patientPanel;
 
+	private static final String strResearcher = "Researcher";
+	private static final String strPatient = "Patient";
 
 	/**
 	 * Create the frame.
@@ -90,11 +96,16 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		menuBar.add(mnView);
 		
 		rdbtnmntmPatient = new JRadioButtonMenuItem("Patient");
+		rdbtnmntmPatient.addActionListener(this);
+		rdbtnmntmPatient.setActionCommand(rdbtnmntmPatient.getText());
 		rdbtnmntmPatient.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK));
 		buttonGroup.add(rdbtnmntmPatient);
 		mnView.add(rdbtnmntmPatient);
 		
 		rdbtnmntmResearcher = new JRadioButtonMenuItem("Researcher");
+		rdbtnmntmResearcher.setSelected(true);
+		rdbtnmntmResearcher.addActionListener(this);
+		rdbtnmntmResearcher.setActionCommand(rdbtnmntmResearcher.getText());
 		rdbtnmntmResearcher.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 		buttonGroup.add(rdbtnmntmResearcher);
 		mnView.add(rdbtnmntmResearcher);
@@ -141,7 +152,10 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		cardPanel.setLayout(new CardLayout(0, 0));
 		
 		graphsPanel = new GraphsPanel();
-		cardPanel.add(graphsPanel, "name_9808530924142");
+		cardPanel.add(graphsPanel, strResearcher);
+		
+		patientPanel = new PatientPanel((JFreeChart) null, (String) null);
+		cardPanel.add(patientPanel, strPatient);
 		
 		soundSourcePanel = new SoundSourcePanel();
 		mainPanel.add(soundSourcePanel, BorderLayout.NORTH);
@@ -178,6 +192,14 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 			dialog.refreshGraph();
 			dialog.setVisible(true);
 		}
+		else if(action.equals(rdbtnmntmPatient.getText()))
+		{
+			((CardLayout)cardPanel.getLayout()).show(cardPanel, strPatient);
+		}
+		else if(action.equals(rdbtnmntmResearcher.getText()))
+		{
+			((CardLayout)cardPanel.getLayout()).show(cardPanel, strResearcher);
+		}
 	}
 
 	@Override
@@ -209,5 +231,11 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	{
 		ProgressBarController.getInstance().removeProgressBar(progressBar);
 		super.dispose();
+	}
+
+	@Override
+	public IPatientView getPatientView()
+	{
+		return patientPanel;
 	}
 }

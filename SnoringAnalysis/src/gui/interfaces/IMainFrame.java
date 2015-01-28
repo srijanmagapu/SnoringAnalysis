@@ -9,4 +9,5 @@ public interface IMainFrame
 	public IGraphsPanel getIGraphsPanel();
 	public ISourcePanel getSourcePanel();
 	public IProgressBar getIProgressBar();
+	public IPatientView getPatientView();
 }

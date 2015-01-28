@@ -10,8 +10,8 @@ import gui.interfaces.ISignalGraph;
 
 public class SignalGraphController implements Observer
 {
-	private ISignalGraph view;
-	private SignalBuffer buffer;
+	protected ISignalGraph view;
+	protected SignalBuffer buffer;
 	
 	public SignalGraphController(ISignalGraph view, SignalBuffer buffer)
 	{
@@ -33,18 +33,18 @@ public class SignalGraphController implements Observer
 		});
 	}
 	
-	private double[] createXData(float[] data)
+	protected double[] createXData(float[] data)
 	{
 		double[] xData = new double[data.length];
 		
 		for(int i = 0; i < data.length; i++)
 			xData[i] = i + 1;
-		
+
 		return xData;
 	}
 	
 	
-	private double[] createYData(float[] data)
+	protected double[] createYData(float[] data)
 	{
 		double[] yData = new double[data.length];
 		for(int i = 0; i < data.length; i++)

@@ -1,7 +1,5 @@
 package gui.settingsWindow;
 
-import gui.conrollers.ProgressBarController;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;

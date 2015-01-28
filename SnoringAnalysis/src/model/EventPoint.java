@@ -1,16 +1,16 @@
 package model;
 
-public class EventPoint
+public class EventPoint implements Comparable<EventPoint>
 {
 	private double[] coordinates;
 	private int cluster;
-	private double startTime;
-	private double endTime;
+	private TimeStamp timeStamp;
 
 	public EventPoint(double[] coordinates, int cluster)
 	{
 		this.coordinates = coordinates;
 		this.cluster = cluster;
+		this.timeStamp = new TimeStamp(0, 0);
 	}
 
 	public void setCoordinates(double[] coordinates)
@@ -33,23 +33,20 @@ public class EventPoint
 		return this.cluster;
 	}
 
-	public double getStartTime()
+	
+	public TimeStamp getTimeStamp()
 	{
-		return startTime;
+		return timeStamp;
 	}
 
-	public void setStartTime(double startTime)
+	public void setTimeStamp(TimeStamp timeStamp)
 	{
-		this.startTime = startTime;
+		this.timeStamp = timeStamp;
 	}
 
-	public double getEndTime()
+	@Override
+	public int compareTo(EventPoint point)
 	{
-		return endTime;
-	}
-
-	public void setEndTime(double endTime)
-	{
-		this.endTime = endTime;
+		return new Double(timeStamp.getStart()).compareTo(new Double(point.getTimeStamp().getStart())); 
 	}
 }

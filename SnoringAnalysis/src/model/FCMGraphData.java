@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 import org.battelle.clodhopper.distance.DistanceMetric;
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
 
@@ -78,10 +80,14 @@ public class FCMGraphData
 		this.points.add(points);
 	}
 	
-	public void addPoints(double[][] points)
+	public void addPoints(double[][] points, List<TimeStamp> timeStamps)
 	{
 		for(int i = 0; i < points.length; i++)
-			addPoint(new EventPoint(points[i], getClosestCluster(points[i])));
+		{
+			EventPoint point = new EventPoint(points[i], getClosestCluster(points[i]));
+			point.setTimeStamp(timeStamps.get(i));
+			addPoint(point);
+		}
 	}
 	
 	

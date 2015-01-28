@@ -1,8 +1,12 @@
 package businessLayer;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 import math.DwVector;
 import math.PCA;
 import model.FCMGraphData;
+import model.TimeStamp;
 
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansClusterer;
 import org.battelle.clodhopper.fuzzycmeans.FuzzyCMeansParams;
@@ -13,16 +17,16 @@ import utils.DBUtils;
 
 public class DBCreator extends FeatureConsumer
 {
-
 	public DBCreator(int dim, int numberOfClusters)
 	{
 		super(dim, numberOfClusters);
 	}
 
 	@Override
-	protected void finishConstuction(double[] vector)
+	protected void finishConstuction(double[] vector, TimeStamp timeStamp)
 	{
 		data.add(vector);
+		timeStamps.add(timeStamp);
 	}
 
 	@Override
@@ -81,7 +85,9 @@ public class DBCreator extends FeatureConsumer
 			{
 				centers[i] = fcmClusterer.getClusterCenter(i);
 			}
-
+			
+			centers = sortCenters(centers);
+			
 			// store cluster centers
 			DBUtils.storeClusterCenters(centers);
 			
@@ -96,18 +102,53 @@ public class DBCreator extends FeatureConsumer
 			{
 				membership[i] = fcmClusterer.getDegreesOfMembership(i);
 			}
-
+			
 			// store membership and points
 			DBUtils.storePointsWithMembership(reducedRaw, membership);
 
 			// set points for fcm graph
-			FCMGraphData.getInstance().addPoints(reducedRaw);
+			FCMGraphData.getInstance().addPoints(reducedRaw, timeStamps);
 		}
 		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
 			// e.printStackTrace();
 		}
+	}
+
+	private double[][] sortCenters(double[][] centers)
+	{
+		double zeroPoint[] = new double[]{0,0,0};
+		double[] dists = new double[centers.length];
+		
+		for(int i = 0; i < centers.length; i++)
+		{
+			dists[i] = distMetric.distance(zeroPoint, centers[i]);
+		}
+		
+		HashMap<Double, double[]> distToPoint = new HashMap<>();
+		for(int i = 0; i < centers.length; i++)
+		{
+			distToPoint.put(new Double(dists[i]), centers[i]);
+		}
+		
+		Arrays.sort(dists);
+
+		double sorted[][] = new double[centers.length][];
+		try
+		{
+			for (int i = 0; i < sorted.length; i++)
+			{
+				sorted[i] = distToPoint.get(new Double(dists[i]));
+			}
+
+		}
+		catch (Exception ex)
+		{
+			System.out.println();
+		}
+		
+		return sorted;
 	}
 
 }

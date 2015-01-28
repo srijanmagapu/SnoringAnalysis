@@ -96,8 +96,8 @@ public class MFCCProcessor implements AudioProcessor
 
 		AudioFeature feature = new AudioFeature();
 		feature.setData(mfcc);
-		feature.setStartTime(eventStart);
-		feature.setEndTime(eventEnd);
+		feature.setStartTime(eventStart * 1000);
+		feature.setEndTime(eventEnd * 1000);
 		
 		count++;
 		FeatureQueue.getInstance().addMFCCBuffer(feature);

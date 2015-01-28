@@ -13,6 +13,11 @@ public class SignalBuffer extends Observable
 		this.sampleRate = sampleRate;
 	}
 	
+	public float getSampleRate()
+	{
+		return this.sampleRate;
+	}
+	
 	public void setBuffer(float[] buffer)
 	{
 		this.buffer = buffer.clone();

@@ -73,5 +73,5 @@ public class EventPointList extends Observable implements Iterable<EventPoint>
 	{
 		return list.iterator();
 	}
-
+	
 }

@@ -2,6 +2,7 @@ package gui;
 
 import gui.conrollers.ProcessHandlerController;
 import gui.conrollers.ProgressBarController;
+import gui.dbCreatorWindow.DBCreatorWindow;
 import gui.graphs.FCMDialog;
 import gui.interfaces.IGraphsPanel;
 import gui.interfaces.IMainFrame;
@@ -55,7 +56,7 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 	private JRadioButtonMenuItem rdbtnmntmPatient;
 	private JRadioButtonMenuItem rdbtnmntmResearcher;
 	private JMenuItem mntmClusterring;
-	private JMenuItem mntmPreferences;
+	private JMenuItem mntmCreateDB;
 	private GraphsPanel graphsPanel;
 	private JPanel cardPanel;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
@@ -119,10 +120,10 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		mntmClusterring.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		mnTools.add(mntmClusterring);
 		
-		mntmPreferences = new JMenuItem("Preferences");
-		mntmPreferences.addActionListener(this);
-		mntmPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
-		mnTools.add(mntmPreferences);
+		mntmCreateDB = new JMenuItem("Create Database");
+		mntmCreateDB.addActionListener(this);
+		mntmCreateDB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		mnTools.add(mntmCreateDB);
 		
 		mnHelp = new JMenu("Help");
 		mnHelp.setMnemonic('H');
@@ -167,10 +168,10 @@ public class MainFrame extends JFrame implements ActionListener, IMainFrame
 		JMenuItem button = (JMenuItem)e.getSource();
 		String action = button.getActionCommand();
 		
-		if(action.equals(mntmPreferences.getText()))
+		if(action.equals(mntmCreateDB.getText()))
 		{
-			SettingsWindow settingsWindow  = new SettingsWindow(this, true);
-			settingsWindow.setVisible(true);
+			DBCreatorWindow dbCreator = new DBCreatorWindow();
+			dbCreator.setVisible(true);
 		}
 		else if(action.equals(mntmAbout.getText()))
 		{
